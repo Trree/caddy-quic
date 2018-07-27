@@ -1,0 +1,9 @@
+{
+  "description": "List of pages (URLs) for measuring quic performance using standalone quic client and server. These URLs are for testing only and are provided without guarantee.",
+  "pages": [
+    {
+      "url": "https://quic.clemente.io/index.html",
+      "why": "A warmup page."
+    }
+  ]
+}

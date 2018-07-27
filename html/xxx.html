@@ -1,0 +1,2430 @@
+
+Log In Sign Up
+
+Server Fault
+Questions
+
+Tags
+
+Users
+
+Badges
+
+Log In Sign Up
+
+Server Fault
+Questions
+
+Tags
+
+Users
+
+Badges
+
+Unanswered
+
+Ask Question
+_ Server Fault is a question and answer site for system and network administrators. Join them; it only takes a minute: 
+
+Sign up
+Here's how it works:
+Anybody can ask a question  Anybody can answer  The best answers are voted up and rise to the top
+HTTP not finishing over LAN. Hardware cause?
+
+up vote
+2
+down vote
+favorite
+On a customer server running Apache 2.2 on Windows server 2012 we're noticing that from time to time, some requests to the server never finish. Using wireshark I've found a bunch of duplicate ACKs get sent to the server as soon as it starts answering the request and after a few seconds a couple of retransmissions are received from the server.
+
+The network setup is really basic with a server and some clients connected to a switch using UTP cables.
+
+I'm not really sure what to make of this. I'm considering asking them to try different cabling, switch and/or NIC's, but would like a second opinion on that.
+
+1 0.000000000 192.168.1.103 -> 192.168.2.100 TCP 66 52011?81 [SYN] Seq=0 Win=8192 Len=0 MSS=1460 WS=256 SACK_PERM=1
+2 0.000742000 192.168.2.100 -> 192.168.1.103 TCP 66 81?52011 [SYN, ACK] Seq=0 Ack=1 Win=8192 Len=0 MSS=1460 WS=256 SACK_PERM=1
+3 0.000782000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=1 Ack=1 Win=65536 Len=0
+4 0.001646000 192.168.1.103 -> 192.168.2.100 HTTP 606 GET /symfony/web/app.php/legacy/mutaties/afroepen.php?afroepid=16250 HTTP/1.1
+5 0.002353000 192.168.2.100 -> 192.168.1.103 TCP 60 81?52011 [ACK] Seq=1 Ack=553 Win=65536 Len=0
+6 0.747171000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+7 0.747172000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+8 0.747246000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=553 Ack=2921 Win=65536 Len=0
+9 0.747504000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+10 0.747507000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+11 0.747562000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=553 Ack=5841 Win=65536 Len=0
+12 0.748241000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+13 0.748242000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+14 0.748243000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+15 0.748244000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+16 0.748319000 192.168.1.103 -> 192.168.2.100 TCP 66 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=10221
+17 0.748338000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#1] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=11681
+18 0.748593000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+19 0.748594000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+20 0.748595000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+21 0.748624000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#2] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=13141
+22 0.748643000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#3] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=14601
+23 0.748654000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#4] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=16061
+24 0.748965000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+25 0.748966000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+26 0.748967000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+27 0.748999000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#5] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=18981 SLE=8761 SRE=16061
+28 0.749014000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#6] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=20441 SLE=8761 SRE=16061
+29 0.749249000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+30 0.749250000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+31 0.749275000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#7] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=21901 SLE=8761 SRE=16061
+32 0.749289000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#8] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+33 0.749578000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Fast Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+34 0.749581000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+35 0.749907000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+36 0.749909000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+37 0.749910000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=16061 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+38 0.749939000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#9] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=26281 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+39 0.749958000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#10] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=27741 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+40 0.750240000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+41 0.750241000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+42 0.750269000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#11] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=29201 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+43 0.750289000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#12] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=30661 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+44 0.750622000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+45 0.750624000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+46 0.750649000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#13] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+47 0.751016000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=23361 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+48 0.751017000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+49 0.751059000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#14] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=35041 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+50 0.751549000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+51 0.751551000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+52 0.751567000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#15] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=36501 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+53 0.751582000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#16] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=37961 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+54 0.752392000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+55 0.752393000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+56 0.752394000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=32121 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+57 0.752396000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+58 0.752406000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#17] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+59 0.752433000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#18] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=42341 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+60 0.753551000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+61 0.753553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+62 0.753571000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#19] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=43801 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+63 0.753588000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#20] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=45261 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+64 0.754550000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+65 0.754553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=39421 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+66 0.754553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+67 0.754572000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#21] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=46721 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+68 0.754610000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#22] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=48181 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+69 1.055597000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+70 1.664583000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+71 2.867842000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+72 5.274379000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+73 10.071711000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+74 19.685995000 192.168.2.100 -> 192.168.1.103 TCP 60 81?52011 [RST, ACK] Seq=8761 Ack=553 Win=0 Len=0
+75 19.686030000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#23] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=48181 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+76 45.752325000 192.168.1.103 -> 192.168.2.100 TCP 55 [TCP Keep-Alive] [TCP Window Full] 52011?81 [ACK] Seq=552 Ack=7301 Win=65536 Len=1
+77 58.686133000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+78 58.985830000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+79 59.585853000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+80 60.785894000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+81 63.185944000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+82 67.988211000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+83 77.582500000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [RST, ACK] Seq=554 Ack=7301 Win=0 Len=0
+windows-server-2012 http tcp wireshark
+shareimprove this question
+asked Oct 6 '14 at 14:07
+
+Hans Allis
+1112
+add a comment
+4 Answers
+active oldest votes
+up vote
+2
+down vote
+That log screams, to me, of either a cabling problem or a duplex mismatch between a device and the switch. I'd consider forcing the speed / duplex on the NICs on two devices (the server and a client) to 100Base-TX half-duplex and working up from there.
+
+Shoddy patch cables, bad NIC drivers, or a failing switch could cause these behaviors, too. It's important to try to isolate the problem by taking a systematic approach-- changing one thing at a time and testing before making further changes.
+
+shareimprove this answer
+answered Oct 6 '14 at 17:56
+
+Evan Anderson
+133k13161305
+add a comment
+up vote
+1
+down vote
+I was seeing similar issue when connection was initiated from a Windows 2012 Server R2 Core guest on VirtualBox 5.1 over bridged network with Centos 6 as VirtualBox host. While i am still investigating the problem, disabling ECN (https://en.wikipedia.org/wiki/Explicit_Congestion_Notification) on Windows machine solved my issue. Your trace shows that ECN is disabled so it is not the answer but I thought it might help others.
+
+EDIT: Disabling GRO (Generic Receive Offload) also work make it work:
+
+ethtool -K eth0 gro off
+shareimprove this answer
+edited Mar 31 '17 at 16:20
+answered Mar 21 '17 at 11:16
+
+Jacek Tomaka
+112
+add a comment
+up vote
+0
+down vote
+I would say you only lost one packet there. The client is doing selective acknowledgement and getting all the data except one packet. Wireshark says it is a duplicated ack, but it's not. Finally the server decides to send the lost packet back at frame 69 (0.3s after finishing sending the HTTP response), tries 4 times and decides to kill the connection due to time-out (client unresponsive). The client finally decides to acknowledge it got the lost packet, way after expected.
+
+Client side looks weird to me. Rule out any 3rd party drivers on the network stack (e.g. antivirus or other security software). Also try to rule out any devices in between that could be doing packet inspection. Although based on the time deltas I think the capture was taken on the client so that pretty much rules out the client packets being modified on its way by a third party device.
+
+shareimprove this answer
+answered Feb 17 '15 at 11:00
+
+Pedro Perez
+2,034157
+add a comment
+up vote
+0
+down vote
+the retransmisson of the missing frame is already in Frame 33 - you can tell by the seq=7301.
+
+33 0.749578000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Fast Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460
+
+Also the duplicate Ack is present - cause there are multiple Ack with Ack=7301 cause this is the missing frame.
+
+Just the client isn't recognising this frame.
+
+I would guess that the trace has been taken on the server - seeing outgoing packets - but they may not be received at the client side - (indicated by the dup ack) packets.
+
+A trace of the situation at the client side would probably show that these frames never arived. So i would say - the already mentioned cabling or duplex settings would be a good guess for the cause.
+
+shareimprove this answer
+edited Mar 2 '15 at 21:32
+
+Dave M
+4,28572328
+answered Mar 2 '15 at 15:59
+
+Helmuth
+1
+add a comment
+Your Answer
+
+
+
+
+By posting your answer, you agree to the privacy policy and terms of service.
+
+Not the answer you're looking for? Browse other questions tagged windows-server-2012 http tcp wireshark or ask your own question.
+
+asked
+
+3 years, 6 months ago
+
+viewed
+
+4,425 times
+
+active
+
+1 year ago
+
+Work from anywhere
+Senior fullstack engineer
+Sticker MuleNo office location
+$90K - $115KREMOTE
+ruby-on-railsjavascript
+Application Security Engineer
+Wikimedia Foundation, Inc.San Francisco, CA
+REMOTE
+phpjavascript
+Work remotely - from home or wherever you choose.
+
+Browse remote jobs
+Related
+
+1
+Shrinking TCP Window Size to 0
+0
+Causes of HTTP to be down, but not HTTPS?
+2
+TCP Window Size going to 0 / Wget stops downloading?
+3
+huge packet loss and checksum errors
+6
+TCP RST right after FIN/ACK
+13
+How do I prevent TCP connection freezes over an OpenVPN network?
+1
+Apache proxy HTTP CONNECT method handshake failure between Apache server and destination server
+3
+FTP client/server failing on switching to PASV mode
+3
+How can one redirect to a new host all traffic destined for an old host?
+1
+What is causing RST ACK in my connections?
+Hot Network Questions
+
+find the pattern in this number sequence of 1's and 0's
+Bash script append variable to file
+Does ripping up the only signed contract form invalidate it?
+Is it okay to sacrifice exact country flag designs in favor of aesthetics?
+If WhatsApp cannot read our message, how can the media forwarding happen in an instant?
+more hot questions
+question feed
+SERVER FAULT
+
+Tour
+Help
+Chat
+Contact
+Feedback
+Mobile
+COMPANY
+
+Stack Overflow
+Stack Overflow Business
+Developer Jobs
+About
+Press
+Legal
+Privacy Policy
+STACK EXCHANGE
+NETWORK
+
+Technology
+Life / Arts
+Culture / Recreation
+Science
+Other
+Blog
+Facebook
+Twitter
+LinkedIn
+site design / logo © 2018 Stack Exchange Inc; user contributions licensed under cc by-sa 3.0 with attribution required. rev 2018.4.19.29942
+
+Server Fault requires external JavaScript from another domain, which is blocked or failed to load.die.net
+send(2) - Linux man page
+
+Name
+
+send, sendto, sendmsg - send a message on a socket
+
+Synopsis
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+const struct sockaddr *dest_addr, socklen_t addrlen);
+
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+Description
+
+The system calls send(), sendto(), and sendmsg() are used to transmit a message to another socket.
+
+The send() call may be used only when the socket is in a connected state (so that the intended recipient is known). The only difference between send() and write(2) is the presence of flags. With a zero flags argument, send() is equivalent to write(2). Also, the following call
+
+send(sockfd, buf, len, flags);
+
+is equivalent to
+
+sendto(sockfd, buf, len, flags, NULL, 0);
+
+The argument sockfd is the file descriptor of the sending socket.
+
+If sendto() is used on a connection-mode (SOCK_STREAM, SOCK_SEQPACKET) socket, the arguments dest_addr and addrlen are ignored (and the error EISCONN may be returned when they are not NULL and 0), and the error ENOTCONN is returned when the socket was not actually connected. Otherwise, the address of the target is given by dest_addr with addrlen specifying its size. For sendmsg(), the address of the target is given by msg.msg_name, with msg.msg_namelen specifying its size.
+
+For send() and sendto(), the message is found in buf and has length len. For sendmsg(), the message is pointed to by the elements of the array msg.msg_iov. The sendmsg() call also allows sending ancillary data (also known as control information).
+
+If the message is too long to pass atomically through the underlying protocol, the error EMSGSIZE is returned, and the message is not transmitted.
+
+No indication of failure to deliver is implicit in a send(). Locally detected errors are indicated by a return value of -1.
+
+When the message does not fit into the send buffer of the socket, send() normally blocks, unless the socket has been placed in nonblocking I/O mode. In nonblocking mode it would fail with the error EAGAIN or EWOULDBLOCK in this case. The select(2) call may be used to determine when it is possible to send more data.
+
+The flags argument is the bitwise OR of zero or more of the following flags.
+
+MSG_CONFIRM (Since Linux 2.3.15)
+Tell the link layer that forward progress happened: you got a successful reply from the other side. If the link layer doesn't get this it will regularly reprobe the neighbor (e.g., via a unicast ARP). Only valid on SOCK_DGRAM and SOCK_RAW sockets and currently only implemented for IPv4 and IPv6. See arp(7) for details.
+MSG_DONTROUTE
+Don't use a gateway to send out the packet, only send to hosts on directly connected networks. This is usually used only by diagnostic or routing programs. This is only defined for protocol families that route; packet sockets don't.
+MSG_DONTWAIT (since Linux 2.2)
+Enables nonblocking operation; if the operation would block, EAGAIN or EWOULDBLOCK is returned (this can also be enabled using the O_NONBLOCK flag with the F_SETFL fcntl(2)).
+MSG_EOR (since Linux 2.2)
+Terminates a record (when this notion is supported, as for sockets of type SOCK_SEQPACKET).
+MSG_MORE (Since Linux 2.4.4)
+The caller has more data to send. This flag is used with TCP sockets to obtain the same effect as the TCP_CORK socket option (see tcp(7)), with the difference that this flag can be set on a per-call basis.
+Since Linux 2.6, this flag is also supported for UDP sockets, and informs the kernel to package all of the data sent in calls with this flag set into a single datagram which is only transmitted when a call is performed that does not specify this flag. (See also the UDP_CORK socket option described in udp(7).)
+
+MSG_NOSIGNAL (since Linux 2.2)
+Requests not to send SIGPIPE on errors on stream oriented sockets when the other end breaks the connection. The EPIPE error is still returned.
+MSG_OOB
+Sends out-of-band data on sockets that support this notion (e.g., of type SOCK_STREAM); the underlying protocol must also support out-of-band data.
+The definition of the msghdr structure follows. See recv(2) and below for an exact description of its fields.
+struct msghdr {
+void         *msg_name;       /* optional address */
+socklen_t     msg_namelen;    /* size of address */
+struct iovec *msg_iov;        /* scatter/gather array */
+size_t        msg_iovlen;     /* # elements in msg_iov */
+void         *msg_control;    /* ancillary data, see below */
+size_t        msg_controllen; /* ancillary data buffer len */
+int           msg_flags;      /* flags on received message */
+
+};
+You may send control information using the msg_control and msg_controllen members. The maximum control buffer length the kernel can process is limited per socket by the value in /proc/sys/net/core/optmem_max; see socket(7).
+Return Value
+
+On success, these calls return the number of characters sent. On errgnal occurred before any data was transmitted; see signal(7).
+
+EINVAL
+
+Invalid argument passed.
+
+EISCONN
+The connection-mode socket was connected already but a recipient was specified. (Now either this error is returned, or the recipient specification is ignored.)
+EMSGSIZE
+The socket type requires that message be sent atomically, and the size of the message to be sent made this impossible.
+ENOBUFS
+The output queue for a network interface was full. This generally indicates that the interface has stopped sending, but may be caused by transient congestion. (Normally, this does not occur in Linux. Packets are just silently dropped when a device queue overflows.)
+ENOMEM
+No memory available.
+
+ENOTCONN
+The socket is not connected, and no target has been given.
+ENOTSOCK
+The argument sockfd is not a socket.
+EOPNOTSUPP
+Some bit in the flags argument is inappropriate for the socket type.
+EPIPE
+The local end has been shut down on a connection oriented socket. In this case the process will also receive a SIGPIPE unless MSG_NOSIGNAL is set.
+
+Conforming To
+
+4.4BSD, SVr4, POSIX.1-2001. These function calls appeared in 4.2BSD.
+
+POSIX.1-2001 only describes the MSG_OOB and MSG_EOR flags. POSIX.1-2008 adds a specification of MSG_NOSIGNAL. The MSG_CONFIRM flag is a Linux extension.
+
+Notes
+
+The prototypes given above follow the Single UNIX Specification, as glibc2 also does; the flags argument was int in 4.x BSD, but unsigned int in libc4 and libc5; the len argument was int in 4.x BSD and libc4, but size_t in libc5; the addrlen argument was int in 4.x BSD and libc4 and libc5. See also accept(2).
+
+According to POSIX.1-2001, the msg_controllen field of the msghdr structure should be typed as socklen_t, but glibc currently types it as size_t.
+
+See sendmmsg(2) for information about a Linux-specific system call that can be used to transmit multiple datagrams in a single call.
+
+Bugs
+
+Linux may return EPIPE instead of ENOTCONN.
+
+Example
+
+An example of the use of sendto() is shown in getaddrinfo(3).
+
+See Also
+
+fcntl(2), getsockopt(2), recv(2), select(2), sendfile(2), sendmmsg(2), shutdown(2), socket(2), write(2), cmsg(3), ip(7), socket(7), tcp(7), udp(7)
+
+Referenced By
+
+forward(1), gnutls_transport_set_push_function(3), netwrite(3), pth(3), select_tut(2), sockatmark(3), socketcall(2), splice(2), tevent_queue_tutorial(3), unix(7), xinetd.conf(5)
+Site Search
+
+Library
+linux docs
+linux man pages
+page load time
+Toys
+world sunlight
+moon phase
+trace explorer
+backIPv4
+From Wikipedia, the free encyclopedia
+Internet Protocol version 4 (IPv4) is the fourth version of the Internet Protocol (IP). It is one of the core protocols of standards-based internetworking methods in the Internet, and was the first version deployed for production in the ARPANET in 1983. It still routes most Internet traffic today,[1] despite the ongoing deployment of a successor protocol, IPv6. IPv4 is described in IETF publication RFC 791 (September 1981), replacing an earlier definition (RFC 760, January 1980).
+
+IPv4 is a connectionless protocol for use on packet-switched networks. It operates on a best effort delivery model, in that it does not guarantee delivery, nor does it assure proper sequencing or avoidance of duplicate delivery. These aspects, including data integrity, are addressed by an upper layer transport protocol, such as the Transmission Control Protocol (TCP).
+
+Internet protocol suite
+Application layer
+BGP DHCP DNS FTP HTTP IMAP LDAP MGCP MQTT NNTP NTP POP ONC/RPC RTP RTSP RIP SIP SMTP SNMP SSH Telnet TLS/SSL XMPP more...
+Transport layer
+TCP UDP DCCP SCTP RSVP more...
+Internet layer
+IP IPv4 IPv6 ICMP ICMPv6 ECN IGMP IPsec more...
+Link layer
+ARP NDP OSPF Tunnels L2TP PPP MAC Ethernet DSL ISDN FDDI more...
+v t e
+Contents  [hide] 
+1    Addressing
+1.1    Address representations
+1.2    Allocation
+1.3    Special-use addresses
+1.3.1    Private networks
+1.4    Link-local addressing
+1.5    Loopback
+1.6    Addresses ending in 0 or 255
+1.7    Address resolution
+2    Address space exhaustion
+3    Packet structure
+3.1    Header
+3.2    Data
+4    Fragmentation and reassembly
+4.1    Fragmentation
+4.2    Reassembly
+5    Assistive protocols
+6    See also
+7    Notes
+8    References
+9    External links
+Addressing [edit]
+
+Decomposition of the quad-dotted IPv4 address representation to its binary value
+IPv4 uses 32-bit addresses which limits the address space to 4294967296 (232) addresses.
+
+IPv4 reserves special address blocks for private networks (~18 million addresses) and multicast addresses (~270 million addresses).
+
+Address representations[edit]
+IPv4 addresses may be represented in any notation expressing a 32-bit integer value. They are most often written in the dot-decimal notation, which consists of four octets of the address expressed individually in decimal numbers and separated by periods. The CIDR notation standard combines the address with its routing prefix in a compact format, in which the address is followed by a slash character (/) and the count of consecutive 1 bits in the routing prefix (subnet mask).
+
+For example, the quad-dotted IP address 192.0.2.235 represents the 32-bit decimal number 3221226219, which in hexadecimal format is 0xC00002EB. This may also be expressed in dotted hex format as 0xC0.0x00.0x02.0xEB, or with octal byte values as 0300.0000.0002.0353.
+
+Allocation[edit]
+In the original design of IPv4, an IP address was divided into two parts: the network identifier was the most significant (highest order) octet of the address, and the host identifier was the rest of the address. The latter was also called the rest field. This structure permitted a maximum of 256 network identifiers, which was quickly found to be inadequate.
+
+To overcome this limit, the most-significant address octet was redefined in 1981 to create network classes, in a system which later became known as classful networking. The revised system defined five classes. Classes A, B, and C had different bit lengths for network identification. The rest of the address was used as previously to identify a host within a network, which meant that each network class had a different capacity for addressing hosts. Class D was defined for multicast addressing and Class E was reserved for future applications.
+
+Starting around 1985, methods were devised to subdivide IP networks. One method that has proved flexible is the use of the variable-length subnet mask (VLSM).[2][3] Based on the IETF standard RFC 1517 published in 1993, this system of classes was officially replaced with Classless Inter-Domain Routing (CIDR), which expressed the number of bits (from the most significant) as, for instance, /24, and the class-based scheme was dubbed classful, by contrast. CIDR was designed to permit repartitioning of any address space so that smaller or larger blocks of addresses could be allocated to users. The hierarchical structure created by CIDR is managed by the Internet Assigned Numbers Authority (IANA) and the regional Internet registries (RIRs). Each RIR maintains a publicly searchable WHOIS database that provides information about IP address assignments.
+
+Special-use addresses[edit]
+The Internet Engineering Task Force (IETF) and the Internet Assigned Numbers Authority (IANA) have restricted from general use various reserved IP addresses for special purposes. Some are used for maintenance of routing tables, for multicast traffic, operation under failure modes, or to provide addressing space for public, unrestricted uses on private networks.
+
+Reserved address blocks
+Range    Description    Reference
+0.0.0.0/8    Current network (only valid as source address)    RFC 6890
+10.0.0.0/8    Private network    RFC 1918
+100.64.0.0/10    Shared address space for carrier-grade NAT    RFC 6598
+127.0.0.0/8    Loopback    RFC 6890
+169.254.0.0/16    Link-local    RFC 3927
+172.16.0.0/12    Private network    RFC 1918
+192.0.0.0/24    IETF Protocol Assignments    RFC 6890
+192.0.2.0/24    TEST-NET-1, documentation and examples    RFC 5737
+192.88.99.0/24    IPv6 to IPv4 relay (includes 2002::/16)    RFC 3068
+192.168.0.0/16    Private network    RFC 1918
+198.18.0.0/15    Network benchmark tests    RFC 2544
+198.51.100.0/24    TEST-NET-2, documentation and examples    RFC 5737
+203.0.113.0/24    TEST-NET-3, documentation and examples    RFC 5737
+224.0.0.0/4    IP multicast (former Class D network)    RFC 5771
+240.0.0.0/4    Reserved (former Class E network)    RFC 1700
+255.255.255.255    Broadcast    RFC 919
+Private networks[edit]
+Of the approximately four billion addresses defined in IPv4, three ranges are reserved for use in private networks. Packets addresses in these ranges are not routable in the public Internet, because they are ignored by all public routers. Therefore, private hosts cannot directly communicate with public networks, but require network address translation at a routing gateway for this purpose.
+
+Name    Address range    Number of addresses    Classful description    Largest CIDR block
+24-bit block    10.0.0.0 – 10.255.255.255    16777216    Single Class A    10.0.0.0/8
+20-bit block    172.16.0.0 – 172.31.255.255    1048576    Contiguous range of 16 Class B blocks    172.16.0.0/12
+16-bit block    192.168.0.0 – 192.168.255.255    65536    Contiguous range of 256 Class C blocks    192.168.0.0/16
+Since two private networks, e.g., two branch offices, cannot directly interoperate via the public Internet, the two networks must be bridged across the Internet via a virtual private network (VPN) or an IP tunnel, which encapsulate the packet in a protocol layer during transmission across the public network. Additionally, encapsulated packets may be encrypted for the transmission across public networks to secure the data.
+
+Link-local addressing[edit]
+RFC 3927 defines the special address block 169.254.0.0/16 for link-local addressing. These addresses are only valid on links (such as a local network segment or point-to-point connection) connected to a host. These addresses are not routable. Like private addresses, these addresses cannot be the source or destination of packets traversing the internet. These addresses are primarily used for address autoconfiguration (Zeroconf) when a host cannot obtain an IP address from a DHCP server or other internal configuration methods.
+
+When the address block was reserved, no standards existed for address autoconfiguration. Microsoft created an implementation called Automatic Private IP Addressing (APIPA), which was deployed on millions of machines and became a de facto standard. Many years later, in May 2005, the IETF defined a formal standard in RFC 3927, entitled Dynamic Configuration of IPv4 Link-Local Addresses.
+
+Loopback[edit]
+Main article: Loopback
+The class A network 127.0.0.0 (classless network 127.0.0.0/8) is reserved for loopback. IP packets whose source addresses belong to this network should never appear outside a host. The modus operandi of this network expands upon that of a loopback interface:
+
+IP packets whose source and destination addresses belong to the network (or subnetwork) of the same loopback interface are returned to that interface;
+IP packets whose source and destination addresses belong to networks (or subnetworks) of different interfaces of the same host, one of them being a loopback interface, are forwarded regularly.
+Addresses ending in 0 or 255[edit]
+Main article: IPv4 subnetting reference
+Networks with subnet masks of at least 24 bits, i.e. Class C networks in classful networking, and networks with CIDR suffixes /24 to /32 (255.255.255.0–255.255.255.255) may not have an address ending in 0 or 255.
+
+Classful addressing prescribed only three possible subnet masks: Class A, 255.0.0.0 or /8; Class B, 255.255.0.0 or /16; and Class C, 255.255.255.0 or /24. For example, in the subnet 192.168.5.0/255.255.255.0 (192.168.5.0/24) the identifier 192.168.5.0 commonly is used to refer to the entire subnet. To avoid ambiguity in representation, the address ending in the octet 0 is reserved.
+
+A broadcast address[1] is an address that allows information to be sent to all interfaces in a given subnet, rather than a specific machine. Generally, the broadcast address is found by obtaining the bit complement of the subnet mask and performing a bitwise OR operation with the network identifier. In other words, the broadcast address is the last address in the address range of the subnet. For example, the broadcast address for the network 192.168.5.0 is 192.168.5.255. For networks of size /24 or larger, the broadcast address always ends in 255.
+
+However, this does not mean that every address ending in 0 or 255 cannot be used as a host address. For example, in the /16 subnet 192.168.0.0/255.255.0.0, which is equivalent to the address range 192.168.0.0–192.168.255.255, the broadcast address is 192.168.255.255. One can use the following addresses for hosts, even though they end with 255: 192.168.1.255, 192.168.2.255, etc. Also, 192.168.0.0 is the network identifier and must not be assigned to an interface.[4] The addresses 192.168.1.0, 192.168.2.0, etc., may be assigned, despite ending with 0.
+
+In the past, conflict between network addresses and broadcast addresses arose because some software used non-standard broadcast addresses with zeros instead of ones.[5]
+
+In networks smaller than /24, broadcast addresses do not necessarily end with 255. For example, a CIDR subnet 203.0.113.16/28 has the broadcast address 203.0.113.31.
+
+Address resolution[edit]
+Main article: Domain Name System
+Hosts on the Internet are usually known by names, e.g., www.example.com, not primarily by their IP address, which is used for routing and network interface identification. The use of domain names requires translating, called resolving, them to addresses and vice versa. This is analogous to looking up a phone number in a phone book using the recipient's name.
+
+The translation between addresses and domain names is performed by the Domain Name System (DNS), a hierarchical, distributed naming system which allows for subdelegation of name spaces to other DNS servers.
+
+Address space exhaustion[edit]
+Main article: IPv4 address exhaustion
+Since the 1980s, it was apparent that the pool of available IPv4 addresses was being depleted at a rate that was not initially anticipated in the original design of the network address system.[6] The main market forces which accelerated IPv4 address depletion included:
+
+Rapidly growing number of Internet users
+Always-on devices — ADSL modems, cable modems
+Mobile devices — laptop computers, PDAs, mobile phones.
+The threat of exhaustion motivated the introduction of a number of remedial technologies, such as classful networks, Classless Inter-Domain Routing (CIDR) methods, network address translation (NAT) and strict usage-based allocation policies. To provide a long-term solution to the pending address exhaustion, IPv6 was created in the 1990s, which made many more addresses available by increasing the address size to 128 bits. IPv6 has been in commercial deployment since 2006.
+
+The primary address pool of the Internet, maintained by IANA, was exhausted on 3 February 2011, when the last 5 blocks were allocated to the 5 RIRs.[7][8] APNIC was the first RIR to exhaust its regional pool on 15 April 2011, except for a small amount of address space reserved for the transition to IPv6, which will be allocated under a much more restricted policy.[9]
+
+The accepted and standard long term solution is to use IPv6 which increased the address size to 128 bits, providing a vastly increased address space that also allows improved route aggregation across the Internet and offers large subnetwork allocations of a minimum of 264 host addresses to end-users. However IPv4-only hosts cannot directly communicate with IPv6-only hosts so IPv6 alone does not provide an immediate solution to the IPv4 exhaustion problem. Migration to IPv6 is in progress but completion is expected to take considerable time. [10]
+
+Packet structure[edit]
+An IP packet consists of a header section and a data section.
+
+An IP packet has no data checksum or any other footer after the data section. Typically the link layer encapsulates IP packets in frames with a CRC footer that detects most errors, and typically the end-to-end TCP layer checksum detects most other errors.[11]
+
+Header[edit]
+The IPv4 packet header consists of 14 fields, of which 13 are required. The 14th field is optional and aptly named: options. The fields in the header are packed with the most significant byte first (big endian), and for the diagram and discussion, the most significant bits are considered to come first (MSB 0 bit numbering). The most significant bit is numbered 0, so the version field is actually found in the four most significant bits of the first byte, for example.
+
+IPv4 Header Format
+Offsets    Octet    0    1    2    3
+Octet    Bit    0    1    2    3    4    5    6    7    8    9    10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31
+0    0    Version    IHL    DSCP    ECN    Total Length
+4    32    Identification    Flags    Fragment Offset
+8    64    Time To Live    Protocol    Header Checksum
+12    96    Source IP Address
+16    128    Destination IP Address
+20    160    Options (if IHL > 5)
+24    192
+28    224
+32    256
+Version
+The first header field in an IP packet is the four-bit version field. For IPv4, this is always equal to 4.
+Internet Header Length (IHL)
+The Internet Header Length (IHL) field has 4 bits, which is the number of 32-bit words. Since an IPv4 header may contain a variable number of options, this field specifies the size of the header (this also coincides with the offset to the data). The minimum value for this field is 5,[12] which indicates a length of 5 × 32 bits = 160 bits = 20 bytes. As a 4-bit field, the maximum value is 15 words (15 × 32 bits, or 480 bits = 60 bytes).
+Differentiated Services Code Point (DSCP)
+Originally defined as the Type of service (ToS) field. This field is now defined by RFC 2474 (updated by RFC 3168 and RFC 3260) for Differentiated services (DiffServ). New technologies are emerging that require real-time data streaming and therefore make use of the DSCP field. An example is Voice over IP (VoIP), which is used for interactive data voice exchange.
+Explicit Congestion Notification (ECN)
+This field is defined in RFC 3168 and allows end-to-end notification of network congestion without dropping packets. ECN is an optional feature that is only used when both endpoints support it and are willing to use it. It is only effective when supported by the underlying network.
+Total Length
+This 16-bit field defines the entire packet size in bytes, including header and data. The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. All hosts are required to be able to reassemble datagrams of size up to 576 bytes, but most modern hosts handle much larger packets. Sometimes links impose further restrictions on the packet size, in which case datagrams must be fragmented. Fragmentation in IPv4 is handled in either the host or in routers.
+Identification
+This field is an identification field and is primarily used for uniquely identifying the group of fragments of a single IP datagram. Some experimental work has suggested using the ID field for other purposes, such as for adding packet-tracing information to help trace datagrams with spoofed source addresses,[13] but RFC 6864 now prohibits any such use.
+Flags
+A three-bit field follows and is used to control or identify fragments. They are (in order, from most significant to least significant):
+bit 0: Reserved; must be zero.[note 1]
+bit 1: Don't Fragment (DF)
+bit 2: More Fragments (MF)
+If the DF flag is set, and fragmentation is required to route the packet, then the packet is dropped. This can be used when sending packets to a host that does not have sufficient resources to handle fragmentation. It can also be used for Path MTU Discovery, either automatically by the host IP software, or manually using diagnostic tools such as ping or traceroute. For unfragmented packets, the MF flag is cleared. For fragmented packets, all fragments except the last have the MF flag set. The last fragment has a non-zero Fragment Offset field, differentiating it from an unfragmented packet.
+Fragment Offset
+The fragment offset field is measured in units of eight-byte blocks. It is 13 bits long and specifies the offset of a particular fragment relative to the beginning of the original unfragmented IP datagram. The first fragment has an offset of zero. This allows a maximum offset of (213 – 1) × 8 = 65,528 bytes, which would exceed the maximum IP packet length of 65,535 bytes with the header length included (65,528 + 20 = 65,548 bytes).
+Time To Live (TTL)
+An eight-bit time to live field helps prevent datagrams from persisting (e.g. going in circles) on an internet. This field limits a datagram's lifetime. It is specified in seconds, but time intervals less than 1 second are rounded up to 1. In practice, the field has become a hop count—when the datagram arrives at a router, the router decrements the TTL field by one. When the TTL field hits zero, the router discards the packet and typically sends an ICMP Time Exceeded message to the sender. The program traceroute uses these ICMP Time Exceeded messages to print the routers used by packets to go from the source to the destination.
+Protocol
+This field defines the protocol used in the data portion of the IP datagram. The Internet Assigned Numbers Authority maintains a list of IP protocol numbers which was originally defined in RFC 790.
+Header Checksum:
+Main article: IPv4 header checksum
+The 16-bit checksum field is used for error-checking of the header. When a packet arrives at a router, the router calculates the checksum of the header and compares it to the checksum field. If the values do not match, the router discards the packet. Errors in the data field must be handled by the encapsulated protocol. Both UDP and TCP have checksum fields.
+When a packet arrives at a router, the router decreases the TTL field. Consequently, the router must calculate a new checksum.
+
+Source address
+This field is the IPv4 address of the sender of the packet. Note that this address may be changed in transit by a network address translation device.
+Destination address
+This field is the IPv4 address of the receiver of the packet. As with the source address, this may be changed in transit by a network address translation device.
+Options
+The options field is not often used. Note that the value in the IHL field must include enough extra 32-bit words to hold all the options (plus any padding needed to ensure that the header contains an integer number of 32-bit words). The list of options may be terminated with an EOL (End of Options List, 0x00) option; this is only necessary if the end of the options would not otherwise coincide with the end of the header. The possible options that can be put in the header are as follows:
+Field    Size (bits)    Description
+Copied    1    Set to 1 if the options need to be copied into all fragments of a fragmented packet.
+Option Class    2    A general options category. 0 is for "control" options, and 2 is for "debugging and measurement". 1 and 3 are reserved.
+Option Number    5    Specifies an option.
+Option Length    8    Indicates the size of the entire option (including this field). This field may not exist for simple options.
+Option Data    Variable    Option-specific data. This field may not exist for simple options.
+Note: If the header length is greater than 5 (i.e., it is from 6 to 15) it means that the options field is present and must be considered.
+Note: Copied, Option Class, and Option Number are sometimes referred to as a single eight-bit field, the Option Type.
+Packets containing some options may be considered as dangerous by some routers and be blocked.[14]
+
+Data[edit]
+The data portion of the packet is not included in the packet checksum. Its contents are interpreted based on the value of the Protocol header field.
+
+Some of the common protocols for the data portion are listed below:
+
+Protocol Number    Protocol Name    Abbreviation
+1    Internet Control Message Protocol    ICMP
+2    Internet Group Management Protocol    IGMP
+6    Transmission Control Protocol    TCP
+17    User Datagram Protocol    UDP
+41    IPv6 encapsulation    ENCAP
+89    Open Shortest Path First    OSPF
+132    Stream Control Transmission Protocol    SCTP
+See List of IP protocol numbers for a complete list.
+
+Fragmentation and reassembly[edit]
+Main article: IP fragmentation
+The Internet Protocol enables networks to communicate with one another. The design accommodates networks of diverse physical nature; it is independent of the underlying transmission technology used in the Link Layer. Networks with different hardware usually vary not only in transmission speed, but also in the maximum transmission unit (MTU). When one network wants to transmit datagrams to a network with a smaller MTU, it may fragment its datagrams. In IPv4, this function was placed at the Internet Layer, and is performed in IPv4 routers, which thus only require this layer as the highest one implemented in their design.
+
+In contrast, IPv6, the next generation of the Internet Protocol, does not allow routers to perform fragmentation; hosts must determine the path MTU before sending datagrams.
+
+Fragmentation[edit]
+When a router receives a packet, it examines the destination address and determines the outgoing interface to use and that interface's MTU. If the packet size is bigger than the MTU, and the Do not Fragment (DF) bit in the packet's header is set to 0, then the router may fragment the packet.
+
+The router divides the packet into fragments. The max size of each fragment is the MTU minus the IP header size (20 bytes minimum; 60 bytes maximum). The router puts each fragment into its own packet, each fragment packet having following changes:
+
+The total length field is the fragment size.
+The more fragments (MF) flag is set for all fragments except the last one, which is set to 0.
+The fragment offset field is set, based on the offset of the fragment in the original data payload. This is measured in units of eight-byte blocks.
+The header checksum field is recomputed.
+For example, for an MTU of 1,500 bytes and a header size of 20 bytes, the fragment offsets would be multiples of (1500–20)/8 = 185. These multiples are 0, 185, 370, 555, 740, ...
+
+It is possible that a packet is fragmented at one router, and that the fragments are further fragmented at another router. For example, a packet of 4,520 bytes, including the 20 bytes of the IP header (without options) is fragmented to two packets on a link with an MTU of 2,500 bytes:
+
+Fragment    Total bytes    Header bytes    Data bytes    "More fragments" flag    Fragment offset (8-byte blocks)
+1    2500    20    2480    1    0
+2    2040    20    2020    0    310
+The total data size is preserved: 2480 bytes + 2020 bytes = 4500 bytes. The offsets are 0 and 0 + 2480/8 = 310.
+
+On a link with an MTU of 1,500 bytes, each frary 2011.
+Jump up ^ ICANN,nanog mailing list. "Five /8s allocated to RIRs – no unallocated IPv4 unicast /8s remain".
+Jump up ^ Asia-Pacific Network Information Centre (15 April 2011). "APNIC IPv4 Address Pool Reaches Final /8". Archived from the original on 17 August 2011. Retrieved 15 April 2011.
+Jump up ^ 2016 IEEE International Conference on Emerging Technologies and Innovative Business Practices for the Transformation of Societies (EmergiTech) : date, 3-6 Aug. 2016. University of Technology, Mauritius,, Institute of Electrical and Electronics Engineers,. Piscataway, NJ. ISBN 9781509007066. OCLC 972636788.
+Jump up ^ RFC 1726 section 6.2
+Jump up ^ Information Sciences Institute, University of Southern California (September 1981). "RFC 791". Internet Engineering Task Force. Retrieved July 12, 2016.
+Jump up ^ Savage, Stefan. "Practical network support for IP traceback". Retrieved 2010-09-06.
+Jump up ^ "Cisco unofficial FAQ". Retrieved 2012-05-10.
+External links[edit]
+Wikiversity has learning resources about IPv4
+http://www.iana.org — Internet Assigned Numbers Authority (IANA)
+http://www.networksorcery.com/enp/protocol/ip.htm — IP Header Breakdown, including specific options
+RFC 3344 — IPv4 Mobility
+IPv6 vs. carrier-grade NAT/squeezing more out of IPv4
+RIPE report on address consumption as of October 2003
+Official current state of IPv4 /8 allocations, as maintained by IANA
+Dynamically generated graphs of IPv4 address consumption with predictions of exhaustion dates—Geoff Huston
+IP addressing in China and the myth of address shortage
+Countdown of remaining IPv4 available addresses (estimated)
+Authority control    
+GND: 4588596-5
+Categories: Internet ProtocolInternet StandardsInternet layer protocolsNetwork layer protocolsIPv4
+Navigation menu
+Not logged inTalkContributionsCreate accountLog inArticleTalkReadEditView historySearch
+
+Main page
+Contents
+Featured content
+Current events
+Random article
+Donate to Wikipedia
+Wikipedia store
+Interaction
+Help
+About Wikipedia
+Community portal
+Recent changes
+Contact page
+Tools
+What links here
+Related changes
+Upload file
+Special pages
+Permanent link
+Page information
+Wikidata item
+Cite this page
+Print/export
+Create a book
+Download as PDF
+Printable version
+In other projects
+Wikimedia Commons
+
+Languages
+العربية
+Español
+한국어
+हिन्दी
+Русский
+Tiếng Việt
+吴语
+粵語
+中文
+34 more
+Edit links
+This page was last edited on 17 April 2018, at 22:53.
+Text is available under the Creative Commons Attribution-ShareAlike License; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy. Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc., a non-profit organization.
+Privacy policyAbout WikipediaDisclaimersContact WikipediaDevelopersCookie statementMobile viewWikimedia Foundation Powered by MediaWiki
+
+Unanswered
+
+Ask Question
+_ Server Fault is a question and answer site for system and network administrators. Join them; it only takes a minute: 
+
+Sign up
+Here's how it works:
+Anybody can ask a question  Anybody can answer  The best answers are voted up and rise to the top
+HTTP not finishing over LAN. Hardware cause?
+
+up vote
+2
+down vote
+favorite
+On a customer server running Apache 2.2 on Windows server 2012 we're noticing that from time to time, some requests to the server never finish. Using wireshark I've found a bunch of duplicate ACKs get sent to the server as soon as it starts answering the request and after a few seconds a couple of retransmissions are received from the server.
+
+The network setup is really basic with a server and some clients connected to a switch using UTP cables.
+
+I'm not really sure what to make of this. I'm considering asking them to try different cabling, switch and/or NIC's, but would like a second opinion on that.
+
+1 0.000000000 192.168.1.103 -> 192.168.2.100 TCP 66 52011?81 [SYN] Seq=0 Win=8192 Len=0 MSS=1460 WS=256 SACK_PERM=1
+2 0.000742000 192.168.2.100 -> 192.168.1.103 TCP 66 81?52011 [SYN, ACK] Seq=0 Ack=1 Win=8192 Len=0 MSS=1460 WS=256 SACK_PERM=1
+3 0.000782000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=1 Ack=1 Win=65536 Len=0
+4 0.001646000 192.168.1.103 -> 192.168.2.100 HTTP 606 GET /symfony/web/app.php/legacy/mutaties/afroepen.php?afroepid=16250 HTTP/1.1
+5 0.002353000 192.168.2.100 -> 192.168.1.103 TCP 60 81?52011 [ACK] Seq=1 Ack=553 Win=65536 Len=0
+6 0.747171000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+7 0.747172000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+8 0.747246000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=553 Ack=2921 Win=65536 Len=0
+9 0.747504000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+10 0.747507000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+11 0.747562000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [ACK] Seq=553 Ack=5841 Win=65536 Len=0
+12 0.748241000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+13 0.748242000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+14 0.748243000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+15 0.748244000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+16 0.748319000 192.168.1.103 -> 192.168.2.100 TCP 66 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=10221
+17 0.748338000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#1] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=11681
+18 0.748593000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+19 0.748594000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+20 0.748595000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+21 0.748624000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#2] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=13141
+22 0.748643000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#3] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=14601
+23 0.748654000 192.168.1.103 -> 192.168.2.100 TCP 66 [TCP Dup ACK 16#4] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=8761 SRE=16061
+24 0.748965000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+25 0.748966000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+26 0.748967000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+27 0.748999000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#5] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=18981 SLE=8761 SRE=16061
+28 0.749014000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#6] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=20441 SLE=8761 SRE=16061
+29 0.749249000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+30 0.749250000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+31 0.749275000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#7] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=21901 SLE=8761 SRE=16061
+32 0.749289000 192.168.1.103 -> 192.168.2.100 TCP 74 [TCP Dup ACK 16#8] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+33 0.749578000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Fast Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+34 0.749581000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+35 0.749907000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+36 0.749909000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+37 0.749910000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=16061 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+38 0.749939000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#9] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=26281 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+39 0.749958000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#10] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=27741 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+40 0.750240000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+41 0.750241000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+42 0.750269000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#11] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=29201 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+43 0.750289000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#12] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=30661 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+44 0.750622000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+45 0.750624000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+46 0.750649000 192.168.1.103 -> 192.168.2.100 TCP 82 [TCP Dup ACK 16#13] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+47 0.751016000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=23361 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+48 0.751017000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+49 0.751059000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#14] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=35041 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+50 0.751549000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+51 0.751551000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+52 0.751567000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#15] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=36501 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+53 0.751582000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#16] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=37961 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+54 0.752392000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+55 0.752393000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+56 0.752394000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=32121 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+57 0.752396000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+58 0.752406000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#17] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361 SLE=8761 SRE=16061
+59 0.752433000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#18] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=42341 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+60 0.753551000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+61 0.753553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+62 0.753571000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#19] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=43801 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+63 0.753588000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#20] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=45261 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+64 0.754550000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+65 0.754553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Out-Of-Order] 81?52011 [PSH, ACK] Seq=39421 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+66 0.754553000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP segment of a reassembled PDU]
+67 0.754572000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#21] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=46721 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+68 0.754610000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#22] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=48181 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+69 1.055597000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+70 1.664583000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+71 2.867842000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+72 5.274379000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+73 10.071711000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460[Reassembly error, protocol TCP: New fragment overlaps old data (retransmission?)]
+74 19.685995000 192.168.2.100 -> 192.168.1.103 TCP 60 81?52011 [RST, ACK] Seq=8761 Ack=553 Win=0 Len=0
+75 19.686030000 192.168.1.103 -> 192.168.2.100 TCP 90 [TCP Dup ACK 16#23] 52011?81 [ACK] Seq=553 Ack=7301 Win=65536 Len=0 SLE=40881 SRE=48181 SLE=33581 SRE=39421 SLE=24821 SRE=32121 SLE=17521 SRE=23361
+76 45.752325000 192.168.1.103 -> 192.168.2.100 TCP 55 [TCP Keep-Alive] [TCP Window Full] 52011?81 [ACK] Seq=552 Ack=7301 Win=65536 Len=1
+77 58.686133000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+78 58.985830000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+79 59.585853000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+80 60.785894000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+81 63.185944000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+82 67.988211000 192.168.1.103 -> 192.168.2.100 TCP 54 [TCP Retransmission] 52011?81 [FIN, ACK] Seq=553 Ack=7301 Win=65536 Len=0
+83 77.582500000 192.168.1.103 -> 192.168.2.100 TCP 54 52011?81 [RST, ACK] Seq=554 Ack=7301 Win=0 Len=0
+windows-server-2012 http tcp wireshark
+shareimprove this question
+asked Oct 6 '14 at 14:07
+
+Hans Allis
+1112
+add a comment
+4 Answers
+active oldest votes
+up vote
+2
+down vote
+That log screams, to me, of either a cabling problem or a duplex mismatch between a device and the switch. I'd consider forcing the speed / duplex on the NICs on two devices (the server and a client) to 100Base-TX half-duplex and working up from there.
+
+Shoddy patch cables, bad NIC drivers, or a failing switch could cause these behaviors, too. It's important to try to isolate the problem by taking a systematic approach-- changing one thing at a time and testing before making further changes.
+
+shareimprove this answer
+answered Oct 6 '14 at 17:56
+
+Evan Anderson
+133k13161305
+add a comment
+up vote
+1
+down vote
+I was seeing similar issue when connection was initiated from a Windows 2012 Server R2 Core guest on VirtualBox 5.1 over bridged network with Centos 6 as VirtualBox host. While i am still investigating the problem, disabling ECN (https://en.wikipedia.org/wiki/Explicit_Congestion_Notification) on Windows machine solved my issue. Your trace shows that ECN is disabled so it is not the answer but I thought it might help others.
+
+EDIT: Disabling GRO (Generic Receive Offload) also work make it work:
+
+ethtool -K eth0 gro off
+shareimprove this answer
+edited Mar 31 '17 at 16:20
+answered Mar 21 '17 at 11:16
+
+Jacek Tomaka
+112
+add a comment
+up vote
+0
+down vote
+I would say you only lost one packet there. The client is doing selective acknowledgement and getting all the data except one packet. Wireshark says it is a duplicated ack, but it's not. Finally the server decides to send the lost packet back at frame 69 (0.3s after finishing sending the HTTP response), tries 4 times and decides to kill the connection due to time-out (client unresponsive). The client finally decides to acknowledge it got the lost packet, way after expected.
+
+Client side looks weird to me. Rule out any 3rd party drivers on the network stack (e.g. antivirus or other security software). Also try to rule out any devices in between that could be doing packet inspection. Although based on the time deltas I think the capture was taken on the client so that pretty much rules out the client packets being modified on its way by a third party device.
+
+shareimprove this answer
+answered Feb 17 '15 at 11:00
+
+Pedro Perez
+2,034157
+add a comment
+up vote
+0
+down vote
+the retransmisson of the missing frame is already in Frame 33 - you can tell by the seq=7301.
+
+33 0.749578000 192.168.2.100 -> 192.168.1.103 TCP 1514 [TCP Fast Retransmission] 81?52011 [PSH, ACK] Seq=7301 Ack=553 Win=65536 Len=1460
+
+Also the duplicate Ack is present - cause there are multiple Ack with Ack=7301 cause this is the missing frame.
+
+Just the client isn't recognising this frame.
+
+I would guess that the trace has been taken on the server - seeing outgoing packets - but they may not be received at the client side - (indicated by the dup ack) packets.
+
+A trace of the situation at the client side would probably show that these frames never arived. So i would say - the already mentioned cabling or duplex settings would be a good guess for the cause.
+
+shareimprove this answer
+edited Mar 2 '15 at 21:32
+
+Dave M
+4,28572328
+answered Mar 2 '15 at 15:59
+
+Helmuth
+1
+add a comment
+Your Answer
+
+
+
+
+By posting your answer, you agree to the privacy policy and terms of service.
+
+Not the answer you're looking for? Browse other questions tagged windows-server-2012 http tcp wireshark or ask your own question.
+
+asked
+
+3 years, 6 months ago
+
+viewed
+
+4,425 times
+
+active
+
+1 year ago
+
+Work from anywhere
+Senior fullstack engineer
+Sticker MuleNo office location
+$90K - $115KREMOTE
+ruby-on-railsjavascript
+Application Security Engineer
+Wikimedia Foundation, Inc.San Francisco, CA
+REMOTE
+phpjavascript
+Work remotely - from home or wherever you choose.
+
+Browse remote jobs
+Related
+
+1
+Shrinking TCP Window Size to 0
+0
+Causes of HTTP to be down, but not HTTPS?
+2
+TCP Window Size going to 0 / Wget stops downloading?
+3
+huge packet loss and checksum errors
+6
+TCP RST right after FIN/ACK
+13
+How do I prevent TCP connection freezes over an OpenVPN network?
+1
+Apache proxy HTTP CONNECT method handshake failure between Apache server and destination server
+3
+FTP client/server failing on switching to PASV mode
+3
+How can one redirect to a new host all traffic destined for an old host?
+1
+What is causing RST ACK in my connections?
+Hot Network Questions
+
+find the pattern in this number sequence of 1's and 0's
+Bash script append variable to file
+Does ripping up the only signed contract form invalidate it?
+Is it okay to sacrifice exact country flag designs in favor of aesthetics?
+If WhatsApp cannot read our message, how can the media forwarding happen in an instant?
+more hot questions
+question feed
+SERVER FAULT
+
+Tour
+Help
+Chat
+Contact
+Feedback
+Mobile
+COMPANY
+
+Stack Overflow
+Stack Overflow Business
+Developer Jobs
+About
+Press
+Legal
+Privacy Policy
+STACK EXCHANGE
+NETWORK
+
+Technology
+Life / Arts
+Culture / Recreation
+Science
+Other
+Blog
+Facebook
+Twitter
+LinkedIn
+site design / logo © 2018 Stack Exchange Inc; user contributions licensed under cc by-sa 3.0 with attribution required. rev 2018.4.19.29942
+
+Server Fault requires external JavaScript from another domain, which is blocked or failed to load.die.net
+send(2) - Linux man page
+
+Name
+
+send, sendto, sendmsg - send a message on a socket
+
+Synopsis
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+const struct sockaddr *dest_addr, socklen_t addrlen);
+
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+Description
+
+The system calls send(), sendto(), and sendmsg() are used to transmit a message to another socket.
+
+The send() call may be used only when the socket is in a connected state (so that the intended recipient is known). The only difference between send() and write(2) is the presence of flags. With a zero flags argument, send() is equivalent to write(2). Also, the following call
+
+send(sockfd, buf, len, flags);
+
+is equivalent to
+
+sendto(sockfd, buf, len, flags, NULL, 0);
+
+The argument sockfd is the file descriptor of the sending socket.
+
+If sendto() is used on a connection-mode (SOCK_STREAM, SOCK_SEQPACKET) socket, the arguments dest_addr and addrlen are ignored (and the error EISCONN may be returned when they are not NULL and 0), and the error ENOTCONN is returned when the socket was not actually connected. Otherwise, the address of the target is given by dest_addr with addrlen specifying its size. For sendmsg(), the address of the target is given by msg.msg_name, with msg.msg_namelen specifying its size.
+
+For send() and sendto(), the message is found in buf and has length len. For sendmsg(), the message is pointed to by the elements of the array msg.msg_iov. The sendmsg() call also allows sending ancillary data (also known as control information).
+
+If the message is too long to pass atomically through the underlying protocol, the error EMSGSIZE is returned, and the message is not transmitted.
+
+No indication of failure to deliver is implicit in a send(). Locally detected errors are indicated by a return value of -1.
+
+When the message does not fit into the send buffer of the socket, send() normally blocks, unless the socket has been placed in nonblocking I/O mode. In nonblocking mode it would fail with the error EAGAIN or EWOULDBLOCK in this case. The select(2) call may be used to determine when it is possible to send more data.
+
+The flags argument is the bitwise OR of zero or more of the following flags.
+
+MSG_CONFIRM (Since Linux 2.3.15)
+Tell the link layer that forward progress happened: you got a successful reply from the other side. If the link layer doesn't get this it will regularly reprobe the neighbor (e.g., via a unicast ARP). Only valid on SOCK_DGRAM and SOCK_RAW sockets and currently only implemented for IPv4 and IPv6. See arp(7) for details.
+MSG_DONTROUTE
+Don't use a gateway to send out the packet, only send to hosts on directly connected networks. This is usually used only by diagnostic or routing programs. This is only defined for protocol families that route; packet sockets don't.
+MSG_DONTWAIT (since Linux 2.2)
+Enables nonblocking operation; if the operation would block, EAGAIN or EWOULDBLOCK is returned (this can also be enabled using the O_NONBLOCK flag with the F_SETFL fcntl(2)).
+MSG_EOR (since Linux 2.2)
+Terminates a record (when this notion is supported, as for sockets of type SOCK_SEQPACKET).
+MSG_MORE (Since Linux 2.4.4)
+The caller has more data to send. This flag is used with TCP sockets to obtain the same effect as the TCP_CORK socket option (see tcp(7)), with the difference that this flag can be set on a per-call basis.
+Since Linux 2.6, this flag is also supported for UDP sockets, and informs the kernel to package all of the data sent in calls with this flag set into a single datagram which is only transmitted when a call is performed that does not specify this flag. (See also the UDP_CORK socket option described in udp(7).)
+
+MSG_NOSIGNAL (since Linux 2.2)
+Requests not to send SIGPIPE on errors on stream oriented sockets when the other end breaks the connection. The EPIPE error is still returned.
+MSG_OOB
+Sends out-of-band data on sockets that support this notion (e.g., of type SOCK_STREAM); the underlying protocol must also support out-of-band data.
+The definition of the msghdr structure follows. See recv(2) and below for an exact description of its fields.
+struct msghdr {
+void         *msg_name;       /* optional address */
+socklen_t     msg_namelen;    /* size of address */
+struct iovec *msg_iov;        /* scatter/gather array */
+size_t        msg_iovlen;     /* # elements in msg_iov */
+void         *msg_control;    /* ancillary data, see below */
+size_t        msg_controllen; /* ancillary data buffer len */
+int           msg_flags;      /* flags on received message */
+
+};
+You may send control information using the msg_control and msg_controllen members. The maximum control buffer length the kernel can process is limited per socket by the value in /proc/sys/net/core/optmem_max; see socket(7).
+Return Value
+
+On success, these calls return the number of characters sent. On errgnal occurred before any data was transmitted; see signal(7).
+
+EINVAL
+
+Invalid argument passed.
+
+EISCONN
+The connection-mode socket was connected already but a recipient was specified. (Now either this error is returned, or the recipient specification is ignored.)
+EMSGSIZE
+The socket type requires that message be sent atomically, and the size of the message to be sent made this impossible.
+ENOBUFS
+The output queue for a network interface was full. This generally indicates that the interface has stopped sending, but may be caused by transient congestion. (Normally, this does not occur in Linux. Packets are just silently dropped when a device queue overflows.)
+ENOMEM
+No memory available.
+
+ENOTCONN
+The socket is not connected, and no target has been given.
+ENOTSOCK
+The argument sockfd is not a socket.
+EOPNOTSUPP
+Some bit in the flags argument is inappropriate for the socket type.
+EPIPE
+The local end has been shut down on a connection oriented socket. In this case the process will also receive a SIGPIPE unless MSG_NOSIGNAL is set.
+
+Conforming To
+
+4.4BSD, SVr4, POSIX.1-2001. These function calls appeared in 4.2BSD.
+
+POSIX.1-2001 only describes the MSG_OOB and MSG_EOR flags. POSIX.1-2008 adds a specification of MSG_NOSIGNAL. The MSG_CONFIRM flag is a Linux extension.
+
+Notes
+
+The prototypes given above follow the Single UNIX Specification, as glibc2 also does; the flags argument was int in 4.x BSD, but unsigned int in libc4 and libc5; the len argument was int in 4.x BSD and libc4, but size_t in libc5; the addrlen argument was int in 4.x BSD and libc4 and libc5. See also accept(2).
+
+According to POSIX.1-2001, the msg_controllen field of the msghdr structure should be typed as socklen_t, but glibc currently types it as size_t.
+
+See sendmmsg(2) for information about a Linux-specific system call that can be used to transmit multiple datagrams in a single call.
+
+Bugs
+
+Linux may return EPIPE instead of ENOTCONN.
+
+Example
+
+An example of the use of sendto() is shown in getaddrinfo(3).
+
+See Also
+
+fcntl(2), getsockopt(2), recv(2), select(2), sendfile(2), sendmmsg(2), shutdown(2), socket(2), write(2), cmsg(3), ip(7), socket(7), tcp(7), udp(7)
+
+Referenced By
+
+forward(1), gnutls_transport_set_push_function(3), netwrite(3), pth(3), select_tut(2), sockatmark(3), socketcall(2), splice(2), tevent_queue_tutorial(3), unix(7), xinetd.conf(5)
+Site Search
+
+Library
+linux docs
+linux man pages
+page load time
+Toys
+world sunlight
+moon phase
+trace explorer
+backIPv4
+From Wikipedia, the free encyclopedia
+Internet Protocol version 4 (IPv4) is the fourth version of the Internet Protocol (IP). It is one of the core protocols of standards-based internetworking methods in the Internet, and was the first version deployed for production in the ARPANET in 1983. It still routes most Internet traffic today,[1] despite the ongoing deployment of a successor protocol, IPv6. IPv4 is described in IETF publication RFC 791 (September 1981), replacing an earlier definition (RFC 760, January 1980).
+
+IPv4 is a connectionless protocol for use on packet-switched networks. It operates on a best effort delivery model, in that it does not guarantee delivery, nor does it assure proper sequencing or avoidance of duplicate delivery. These aspects, including data integrity, are addressed by an upper layer transport protocol, such as the Transmission Control Protocol (TCP).
+
+Internet protocol suite
+Application layer
+BGP DHCP DNS FTP HTTP IMAP LDAP MGCP MQTT NNTP NTP POP ONC/RPC RTP RTSP RIP SIP SMTP SNMP SSH Telnet TLS/SSL XMPP more...
+Transport layer
+TCP UDP DCCP SCTP RSVP more...
+Internet layer
+IP IPv4 IPv6 ICMP ICMPv6 ECN IGMP IPsec more...
+Link layer
+ARP NDP OSPF Tunnels L2TP PPP MAC Ethernet DSL ISDN FDDI more...
+v t e
+Contents  [hide] 
+1    Addressing
+1.1    Address representations
+1.2    Allocation
+1.3    Special-use addresses
+1.3.1    Private networks
+1.4    Link-local addressing
+1.5    Loopback
+1.6    Addresses ending in 0 or 255
+1.7    Address resolution
+2    Address space exhaustion
+3    Packet structure
+3.1    Header
+3.2    Data
+4    Fragmentation and reassembly
+4.1    Fragmentation
+4.2    Reassembly
+5    Assistive protocols
+6    See also
+7    Notes
+8    References
+9    External links
+Addressing [edit]
+
+Decomposition of the quad-dotted IPv4 address representation to its binary value
+IPv4 uses 32-bit addresses which limits the address space to 4294967296 (232) addresses.
+
+IPv4 reserves special address blocks for private networks (~18 million addresses) and multicast addresses (~270 million addresses).
+
+Address representations[edit]
+IPv4 addresses may be represented in any notation expressing a 32-bit integer value. They are most often written in the dot-decimal notation, which consists of four octets of the address expressed individually in decimal numbers and separated by periods. The CIDR notation standard combines the address with its routing prefix in a compact format, in which the address is followed by a slash character (/) and the count of consecutive 1 bits in the routing prefix (subnet mask).
+
+For example, the quad-dotted IP address 192.0.2.235 represents the 32-bit decimal number 3221226219, which in hexadecimal format is 0xC00002EB. This may also be expressed in dotted hex format as 0xC0.0x00.0x02.0xEB, or with octal byte values as 0300.0000.0002.0353.
+
+Allocation[edit]
+In the original design of IPv4, an IP address was divided into two parts: the network identifier was the most significant (highest order) octet of the address, and the host identifier was the rest of the address. The latter was also called the rest field. This structure permitted a maximum of 256 network identifiers, which was quickly found to be inadequate.
+
+To overcome this limit, the most-significant address octet was redefined in 1981 to create network classes, in a system which later became known as classful networking. The revised system defined five classes. Classes A, B, and C had different bit lengths for network identification. The rest of the address was used as previously to identify a host within a network, which meant that each network class had a different capacity for addressing hosts. Class D was defined for multicast addressing and Class E was reserved for future applications.
+
+Starting around 1985, methods were devised to subdivide IP networks. One method that has proved flexible is the use of the variable-length subnet mask (VLSM).[2][3] Based on the IETF standard RFC 1517 published in 1993, this system of classes was officially replaced with Classless Inter-Domain Routing (CIDR), which expressed the number of bits (from the most significant) as, for instance, /24, and the class-based scheme was dubbed classful, by contrast. CIDR was designed to permit repartitioning of any address space so that smaller or larger blocks of addresses could be allocated to users. The hierarchical structure created by CIDR is managed by the Internet Assigned Numbers Authority (IANA) and the regional Internet registries (RIRs). Each RIR maintains a publicly searchable WHOIS database that provides information about IP address assignments.
+
+Special-use addresses[edit]
+The Internet Engineering Task Force (IETF) and the Internet Assigned Numbers Authority (IANA) have restricted from general use various reserved IP addresses for special purposes. Some are used for maintenance of routing tables, for multicast traffic, operation under failure modes, or to provide addressing space for public, unrestricted uses on private networks.
+
+Reserved address blocks
+Range    Description    Reference
+0.0.0.0/8    Current network (only valid as source address)    RFC 6890
+10.0.0.0/8    Private network    RFC 1918
+100.64.0.0/10    Shared address space for carrier-grade NAT    RFC 6598
+127.0.0.0/8    Loopback    RFC 6890
+169.254.0.0/16    Link-local    RFC 3927
+172.16.0.0/12    Private network    RFC 1918
+192.0.0.0/24    IETF Protocol Assignments    RFC 6890
+192.0.2.0/24    TEST-NET-1, documentation and examples    RFC 5737
+192.88.99.0/24    IPv6 to IPv4 relay (includes 2002::/16)    RFC 3068
+192.168.0.0/16    Private network    RFC 1918
+198.18.0.0/15    Network benchmark tests    RFC 2544
+198.51.100.0/24    TEST-NET-2, documentation and examples    RFC 5737
+203.0.113.0/24    TEST-NET-3, documentation and examples    RFC 5737
+224.0.0.0/4    IP multicast (former Class D network)    RFC 5771
+240.0.0.0/4    Reserved (former Class E network)    RFC 1700
+255.255.255.255    Broadcast    RFC 919
+Private networks[edit]
+Of the approximately four billion addresses defined in IPv4, three ranges are reserved for use in private networks. Packets addresses in these ranges are not routable in the public Internet, because they are ignored by all public routers. Therefore, private hosts cannot directly communicate with public networks, but require network address translation at a routing gateway for this purpose.
+
+Name    Address range    Number of addresses    Classful description    Largest CIDR block
+24-bit block    10.0.0.0 – 10.255.255.255    16777216    Single Class A    10.0.0.0/8
+20-bit block    172.16.0.0 – 172.31.255.255    1048576    Contiguous range of 16 Class B blocks    172.16.0.0/12
+16-bit block    192.168.0.0 – 192.168.255.255    65536    Contiguous range of 256 Class C blocks    192.168.0.0/16
+Since two private networks, e.g., two branch offices, cannot directly interoperate via the public Internet, the two networks must be bridged across the Internet via a virtual private network (VPN) or an IP tunnel, which encapsulate the packet in a protocol layer during transmission across the public network. Additionally, encapsulated packets may be encrypted for the transmission across public networks to secure the data.
+
+Link-local addressing[edit]
+RFC 3927 defines the special address block 169.254.0.0/16 for link-local addressing. These addresses are only valid on links (such as a local network segment or point-to-point connection) connected to a host. These addresses are not routable. Like private addresses, these addresses cannot be the source or destination of packets traversing the internet. These addresses are primarily used for address autoconfiguration (Zeroconf) when a host cannot obtain an IP address from a DHCP server or other internal configuration methods.
+
+When the address block was reserved, no standards existed for address autoconfiguration. Microsoft created an implementation called Automatic Private IP Addressing (APIPA), which was deployed on millions of machines and became a de facto standard. Many years later, in May 2005, the IETF defined a formal standard in RFC 3927, entitled Dynamic Configuration of IPv4 Link-Local Addresses.
+
+Loopback[edit]
+Main article: Loopback
+The class A network 127.0.0.0 (classless network 127.0.0.0/8) is reserved for loopback. IP packets whose source addresses belong to this network should never appear outside a host. The modus operandi of this network expands upon that of a loopback interface:
+
+IP packets whose source and destination addresses belong to the network (or subnetwork) of the same loopback interface are returned to that interface;
+IP packets whose source and destination addresses belong to networks (or subnetworks) of different interfaces of the same host, one of them being a loopback interface, are forwarded regularly.
+Addresses ending in 0 or 255[edit]
+Main article: IPv4 subnetting reference
+Networks with subnet masks of at least 24 bits, i.e. Class C networks in classful networking, and networks with CIDR suffixes /24 to /32 (255.255.255.0–255.255.255.255) may not have an address ending in 0 or 255.
+
+Classful addressing prescribed only three possible subnet masks: Class A, 255.0.0.0 or /8; Class B, 255.255.0.0 or /16; and Class C, 255.255.255.0 or /24. For example, in the subnet 192.168.5.0/255.255.255.0 (192.168.5.0/24) the identifier 192.168.5.0 commonly is used to refer to the entire subnet. To avoid ambiguity in representation, the address ending in the octet 0 is reserved.
+
+A broadcast address[1] is an address that allows information to be sent to all interfaces in a given subnet, rather than a specific machine. Generally, the broadcast address is found by obtaining the bit complement of the subnet mask and performing a bitwise OR operation with the network identifier. In other words, the broadcast address is the last address in the address range of the subnet. For example, the broadcast address for the network 192.168.5.0 is 192.168.5.255. For networks of size /24 or larger, the broadcast address always ends in 255.
+
+However, this does not mean that every address ending in 0 or 255 cannot be used as a host address. For example, in the /16 subnet 192.168.0.0/255.255.0.0, which is equivalent to the address range 192.168.0.0–192.168.255.255, the broadcast address is 192.168.255.255. One can use the following addresses for hosts, even though they end with 255: 192.168.1.255, 192.168.2.255, etc. Also, 192.168.0.0 is the network identifier and must not be assigned to an interface.[4] The addresses 192.168.1.0, 192.168.2.0, etc., may be assigned, despite ending with 0.
+
+In the past, conflict between network addresses and broadcast addresses arose because some software used non-standard broadcast addresses with zeros instead of ones.[5]
+
+In networks smaller than /24, broadcast addresses do not necessarily end with 255. For example, a CIDR subnet 203.0.113.16/28 has the broadcast address 203.0.113.31.
+
+Address resolution[edit]
+Main article: Domain Name System
+Hosts on the Internet are usually known by names, e.g., www.example.com, not primarily by their IP address, which is used for routing and network interface identification. The use of domain names requires translating, called resolving, them to addresses and vice versa. This is analogous to looking up a phone number in a phone book using the recipient's name.
+
+The translation between addresses and domain names is performed by the Domain Name System (DNS), a hierarchical, distributed naming system which allows for subdelegation of name spaces to other DNS servers.
+
+Address space exhaustion[edit]
+Main article: IPv4 address exhaustion
+Since the 1980s, it was apparent that the pool of available IPv4 addresses was being depleted at a rate that was not initially anticipated in the original design of the network address system.[6] The main market forces which accelerated IPv4 address depletion included:
+
+Rapidly growing number of Internet users
+Always-on devices — ADSL modems, cable modems
+Mobile devices — laptop computers, PDAs, mobile phones.
+The threat of exhaustion motivated the introduction of a number of remedial technologies, such as classful networks, Classless Inter-Domain Routing (CIDR) methods, network address translation (NAT) and strict usage-based allocation policies. To provide a long-term solution to the pending address exhaustion, IPv6 was created in the 1990s, which made many more addresses available by increasing the address size to 128 bits. IPv6 has been in commercial deployment since 2006.
+
+The primary address pool of the Internet, maintained by IANA, was exhausted on 3 February 2011, when the last 5 blocks were allocated to the 5 RIRs.[7][8] APNIC was the first RIR to exhaust its regional pool on 15 April 2011, except for a small amount of address space reserved for the transition to IPv6, which will be allocated under a much more restricted policy.[9]
+
+The accepted and standard long term solution is to use IPv6 which increased the address size to 128 bits, providing a vastly increased address space that also allows improved route aggregation across the Internet and offers large subnetwork allocations of a minimum of 264 host addresses to end-users. However IPv4-only hosts cannot directly communicate with IPv6-only hosts so IPv6 alone does not provide an immediate solution to the IPv4 exhaustion problem. Migration to IPv6 is in progress but completion is expected to take considerable time. [10]
+
+Packet structure[edit]
+An IP packet consists of a header section and a data section.
+
+An IP packet has no data checksum or any other footer after the data section. Typically the link layer encapsulates IP packets in frames with a CRC footer that detects most errors, and typically the end-to-end TCP layer checksum detects most other errors.[11]
+
+Header[edit]
+The IPv4 packet header consists of 14 fields, of which 13 are required. The 14th field is optional and aptly named: options. The fields in the header are packed with the most significant byte first (big endian), and for the diagram and discussion, the most significant bits are considered to come first (MSB 0 bit numbering). The most significant bit is numbered 0, so the version field is actually found in the four most significant bits of the first byte, for example.
+
+IPv4 Header Format
+Offsets    Octet    0    1    2    3
+Octet    Bit    0    1    2    3    4    5    6    7    8    9    10    11    12    13    14    15    16    17    18    19    20    21    22    23    24    25    26    27    28    29    30    31
+0    0    Version    IHL    DSCP    ECN    Total Length
+4    32    Identification    Flags    Fragment Offset
+8    64    Time To Live    Protocol    Header Checksum
+12    96    Source IP Address
+16    128    Destination IP Address
+20    160    Options (if IHL > 5)
+24    192
+28    224
+32    256
+Version
+The first header field in an IP packet is the four-bit version field. For IPv4, this is always equal to 4.
+Internet Header Length (IHL)
+The Internet Header Length (IHL) field has 4 bits, which is the number of 32-bit words. Since an IPv4 header may contain a variable number of options, this field specifies the size of the header (this also coincides with the offset to the data). The minimum value for this field is 5,[12] which indicates a length of 5 × 32 bits = 160 bits = 20 bytes. As a 4-bit field, the maximum value is 15 words (15 × 32 bits, or 480 bits = 60 bytes).
+Differentiated Services Code Point (DSCP)
+Originally defined as the Type of service (ToS) field. This field is now defined by RFC 2474 (updated by RFC 3168 and RFC 3260) for Differentiated services (DiffServ). New technologies are emerging that require real-time data streaming and therefore make use of the DSCP field. An example is Voice over IP (VoIP), which is used for interactive data voice exchange.
+Explicit Congestion Notification (ECN)
+This field is defined in RFC 3168 and allows end-to-end notification of network congestion without dropping packets. ECN is an optional feature that is only used when both endpoints support it and are willing to use it. It is only effective when supported by the underlying network.
+Total Length
+This 16-bit field defines the entire packet size in bytes, including header and data. The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. All hosts are required to be able to reassemble datagrams of size up to 576 bytes, but most modern hosts handle much larger packets. Sometimes links impose further restrictions on the packet size, in which case datagrams must be fragmented. Fragmentation in IPv4 is handled in either the host or in routers.
+Identification
+This field is an identification field and is primarily used for uniquely identifying the group of fragments of a single IP datagram. Some experimental work has suggested using the ID field for other purposes, such as for adding packet-tracing information to help trace datagrams with spoofed source addresses,[13] but RFC 6864 now prohibits any such use.
+Flags
+A three-bit field follows and is used to control or identify fragments. They are (in order, from most significant to least significant):
+bit 0: Reserved; must be zero.[note 1]
+bit 1: Don't Fragment (DF)
+bit 2: More Fragments (MF)
+If the DF flag is set, and fragmentation is required to route the packet, then the packet is dropped. This can be used when sending packets to a host that does not have sufficient resources to handle fragmentation. It can also be used for Path MTU Discovery, either automatically by the host IP software, or manually using diagnostic tools such as ping or traceroute. For unfragmented packets, the MF flag is cleared. For fragmented packets, all fragments except the last have the MF flag set. The last fragment has a non-zero Fragment Offset field, differentiating it from an unfragmented packet.
+Fragment Offset
+The fragment offset field is measured in units of eight-byte blocks. It is 13 bits long and specifies the offset of a particular fragment relative to the beginning of the original unfragmented IP datagram. The first fragment has an offset of zero. This allows a maximum offset of (213 – 1) × 8 = 65,528 bytes, which would exceed the maximum IP packet length of 65,535 bytes with the header length included (65,528 + 20 = 65,548 bytes).
+Time To Live (TTL)
+An eight-bit time to live field helps prevent datagrams from persisting (e.g. going in circles) on an internet. This field limits a datagram's lifetime. It is specified in seconds, but time intervals less than 1 second are rounded up to 1. In practice, the field has become a hop count—when the datagram arrives at a router, the router decrements the TTL field by one. When the TTL field hits zero, the router discards the packet and typically sends an ICMP Time Exceeded message to the sender. The program traceroute uses these ICMP Time Exceeded messages to print the routers used by packets to go from the source to the destination.
+Protocol
+This field defines the protocol used in the data portion of the IP datagram. The Internet Assigned Numbers Authority maintains a list of IP protocol numbers which was originally defined in RFC 790.
+Header Checksum:
+Main article: IPv4 header checksum
+The 16-bit checksum field is used for error-checking of the header. When a packet arrives at a router, the router calculates the checksum of the header and compares it to the checksum field. If the values do not match, the router discards the packet. Errors in the data field must be handled by the encapsulated protocol. Both UDP and TCP have checksum fields.
+When a packet arrives at a router, the router decreases the TTL field. Consequently, the router must calculate a new checksum.
+
+Source address
+This field is the IPv4 address of the sender of the packet. Note that this address may be changed in transit by a network address translation device.
+Destination address
+This field is the IPv4 address of the receiver of the packet. As with the source address, this may be changed in transit by a network address translation device.
+Options
+The options field is not often used. Note that the value in the IHL field must include enough extra 32-bit words to hold all the options (plus any padding needed to ensure that the header contains an integer number of 32-bit words). The list of options may be terminated with an EOL (End of Options List, 0x00) option; this is only necessary if the end of the options would not otherwise coincide with the end of the header. The possible options that can be put in the header are as follows:
+Field    Size (bits)    Description
+Copied    1    Set to 1 if the options need to be copied into all fragments of a fragmented packet.
+Option Class    2    A general options category. 0 is for "control" options, and 2 is for "debugging and measurement". 1 and 3 are reserved.
+Option Number    5    Specifies an option.
+Option Length    8    Indicates the size of the entire option (including this field). This field may not exist for simple options.
+Option Data    Variable    Option-specific data. This field may not exist for simple options.
+Note: If the header length is greater than 5 (i.e., it is from 6 to 15) it means that the options field is present and must be considered.
+Note: Copied, Option Class, and Option Number are sometimes referred to as a single eight-bit field, the Option Type.
+Packets containing some options may be considered as dangerous by some routers and be blocked.[14]
+
+Data[edit]
+The data portion of the packet is not included in the packet checksum. Its contents are interpreted based on the value of the Protocol header field.
+
+Some of the common protocols for the data portion are listed below:
+
+Protocol Number    Protocol Name    Abbreviation
+1    Internet Control Message Protocol    ICMP
+2    Internet Group Management Protocol    IGMP
+6    Transmission Control Protocol    TCP
+17    User Datagram Protocol    UDP
+41    IPv6 encapsulation    ENCAP
+89    Open Shortest Path First    OSPF
+132    Stream Control Transmission Protocol    SCTP
+See List of IP protocol numbers for a complete list.
+
+Fragmentation and reassembly[edit]
+Main article: IP fragmentation
+The Internet Protocol enables networks to communicate with one another. The design accommodates networks of diverse physical nature; it is independent of the underlying transmission technology used in the Link Layer. Networks with different hardware usually vary not only in transmission speed, but also in the maximum transmission unit (MTU). When one network wants to transmit datagrams to a network with a smaller MTU, it may fragment its datagrams. In IPv4, this function was placed at the Internet Layer, and is performed in IPv4 routers, which thus only require this layer as the highest one implemented in their design.
+
+In contrast, IPv6, the next generation of the Internet Protocol, does not allow routers to perform fragmentation; hosts must determine the path MTU before sending datagrams.
+
+Fragmentation[edit]
+When a router receives a packet, it examines the destination address and determines the outgoing interface to use and that interface's MTU. If the packet size is bigger than the MTU, and the Do not Fragment (DF) bit in the packet's header is set to 0, then the router may fragment the packet.
+
+The router divides the packet into fragments. The max size of each fragment is the MTU minus the IP header size (20 bytes minimum; 60 bytes maximum). The router puts each fragment into its own packet, each fragment packet having following changes:
+
+The total length field is the fragment size.
+The more fragments (MF) flag is set for all fragments except the last one, which is set to 0.
+The fragment offset field is set, based on the offset of the fragment in the original data payload. This is measured in units of eight-byte blocks.
+The header checksum field is recomputed.
+For example, for an MTU of 1,500 bytes and a header size of 20 bytes, the fragment offsets would be multiples of (1500–20)/8 = 185. These multiples are 0, 185, 370, 555, 740, ...
+
+It is possible that a packet is fragmented at one router, and that the fragments are further fragmented at another router. For example, a packet of 4,520 bytes, including the 20 bytes of the IP header (without options) is fragmented to two packets on a link with an MTU of 2,500 bytes:
+
+Fragment    Total bytes    Header bytes    Data bytes    "More fragments" flag    Fragment offset (8-byte blocks)
+1    2500    20    2480    1    0
+2    2040    20    2020    0    310
+The total data size is preserved: 2480 bytes + 2020 bytes = 4500 bytes. The offsets are 0 and 0 + 2480/8 = 310.
+
+On a link with an MTU of 1,500 bytes, each frary 2011.
+Jump up ^ ICANN,nanog mailing list. "Five /8s allocated to RIRs – no unallocated IPv4 unicast /8s remain".
+Jump up ^ Asia-Pacific Network Information Centre (15 April 2011). "APNIC IPv4 Address Pool Reaches Final /8". Archived from the original on 17 August 2011. Retrieved 15 April 2011.
+Jump up ^ 2016 IEEE International Conference on Emerging Technologies and Innovative Business Practices for the Transformation of Societies (EmergiTech) : date, 3-6 Aug. 2016. University of Technology, Mauritius,, Institute of Electrical and Electronics Engineers,. Piscataway, NJ. ISBN 9781509007066. OCLC 972636788.
+Jump up ^ RFC 1726 section 6.2
+Jump up ^ Information Sciences Institute, University of Southern California (September 1981). "RFC 791". Internet Engineering Task Force. Retrieved July 12, 2016.
+Jump up ^ Savage, Stefan. "Practical network support for IP traceback". Retrieved 2010-09-06.
+Jump up ^ "Cisco unofficial FAQ". Retrieved 2012-05-10.
+External links[edit]
+Wikiversity has learning resources about IPv4
+http://www.iana.org — Internet Assigned Numbers Authority (IANA)
+http://www.networksorcery.com/enp/protocol/ip.htm — IP Header Breakdown, including specific options
+RFC 3344 — IPv4 Mobility
+IPv6 vs. carrier-grade NAT/squeezing more out of IPv4
+RIPE report on address consumption as of October 2003
+Official current state of IPv4 /8 allocations, as maintained by IANA
+Dynamically generated graphs of IPv4 address consumption with predictions of exhaustion dates—Geoff Huston
+IP addressing in China and the myth of address shortage
+Countdown of remaining IPv4 available addresses (estimated)
+Authority control    
+GND: 4588596-5
+Categories: Internet ProtocolInternet StandardsInternet layer protocolsNetwork layer protocolsIPv4
+Navigation menu
+Not logged inTalkContributionsCreate accountLog inArticleTalkReadEditView historySearch
+
+Main page
+Contents
+Featured content
+Current events
+Random article
+Donate to Wikipedia
+Wikipedia store
+Interaction
+Help
+About Wikipedia
+Community portal
+Recent changes
+Contact page
+Tools
+What links here
+Related changes
+[Docs] [txt|pdf] [draft-ietf-ipng...] [Tracker] [Diff1] [Diff2] [Errata]
+
+Obsoleted by: 8200                                        DRAFT STANDARD
+Updated by: 5095, 5722, 5871, 6437, 6564, 6935,                         
+6946, 7045, 7112                                Errata Exist
+Network Working Group                                         S. Deering
+Request for Comments: 2460                                         Cisco
+Obsoletes: 1883                                                R. Hinden
+Category: Standards Track                                          Nokia
+December 1998
+
+
+Internet Protocol, Version 6 (IPv6)
+Specification
+
+Status of this Memo
+
+This document specifies an Internet standards track protocol for the
+Internet community, and requests discussion and suggestions for
+improvements.  Please refer to the current edition of the "Internet
+Official Protocol Standards" (STD 1) for the standardization state
+and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+Copyright (C) The Internet Society (1998).  All Rights Reserved.
+
+Abstract
+
+This document specifies version 6 of the Internet Protocol (IPv6),
+also sometimes referred to as IP Next Generation or IPng.
+
+Table of Contents
+
+1. Introduction..................................................2
+2. Terminology...................................................3
+3. IPv6 Header Format............................................4
+4. IPv6 Extension Headers........................................6
+4.1 Extension Header Order...................................7
+4.2 Options..................................................9
+4.3 Hop-by-Hop Options Header...............................11
+4.4 Routing Header..........................................12
+4.5 Fragment Header.........................................18
+4.6 Destination Options Header..............................23
+4.7 No Next Header..........................................24
+5. Packet Size Issues...........................................24
+6. Flow Labels..................................................25
+7. Traffic Classes..............................................25
+8. Upper-Layer Protocol Issues..................................27
+8.1 Upper-Layer Checksums...................................27
+8.2 Maximum Packet Lifetime.................................28
+8.3 Maximum Upper-Layer Payload Size........................28
+8.4 Responding to Packets Carrying Routing Headers..........29
+
+
+
+Deering & Hinden            Standards Track                     [Page 1]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+Appendix A. Semantics and Usage of the Flow Label Field.........30
+Appendix B. Formatting Guidelines for Options...................32
+Security Considerations.........................................35
+Acknowledgments.................................................35
+Authors' Addresses..............................................35
+References......................................................35
+Changes Since RFC-1883..........................................36
+Full Copyright Statement........................................39
+
+1.  Introduction
+
+IP version 6 (IPv6) is a new version of the Internet Protocol,
+designed as the successor to IP version 4 (IPv4) [RFC-791].  The
+changes from IPv4 to IPv6 fall primarily into the following
+categories:
+
+o  Expanded Addressing Capabilities
+
+IPv6 increases the IP address size from 32 bits to 128 bits, to
+support more levels of addressing hierarchy, a much greater
+number of addressable nodes, and simpler auto-configuration of
+addresses.  The scalability of multicast routing is improved by
+adding a "scope" field to multicast addresses.  And a new type
+of address called an "anycast address" is defined, used to send
+a packet to any one of a group of nodes.
+
+o  Header Format Simplification
+
+Some IPv4 header fields have been dropped or made optional, to
+reduce the common-case processing cost of packet handling and
+to limit the bandwidth cost of the IPv6 header.
+
+o  Improved Support for Extensions and Options
+
+Changes in the way IP header options are encoded allows for
+more efficient forwarding, less stringent limits on the length
+of options, and greater flexibility for introducing new options
+in the future.
+
+o  Flow Labeling Capability
+
+A new capability is added to enable the labeling of packets
+belonging to particular traffic "flows" for which the sender
+requests special handling, such as non-default quality of
+service or "real-time" service.
+
+
+
+
+
+
+Deering & Hinden            Standards Track                     [Page 2]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+o  Authentication and Privacy Capabilities
+
+Extensions to support authentication, data integrity, and
+(optional) data confidentiality are specified for IPv6.
+
+This document specifies the basic IPv6 header and the initially-
+defined IPv6 extension headers and options.  It also discusses packet
+size issues, the semantics of flow labels and traffic classes, and
+the effects of IPv6 on upper-layer protocols.  The format and
+semantics of IPv6 addresses are specified separately in [ADDRARCH].
+The IPv6 version of ICMP, which all IPv6 implementations are required
+to include, is specified in [ICMPv6].
+
+2.  Terminology
+
+node        - a device that implements IPv6.
+
+router      - a node that forwards IPv6 packets not explicitly
+addressed to itself.  [See Note below].
+
+host        - any node that is not a router.  [See Note below].
+
+upper layer - a protocol layer immediately above IPv6.  Examples are
+transport protocols such as TCP and UDP, control
+protocols such as ICMP, routing protocols such as OSPF,
+and internet or lower-layer protocols being "tunneled"
+over (i.e., encapsulated in) IPv6 such as IPX,
+AppleTalk, or IPv6 itself.
+
+link        - a communication facility or medium over which nodes can
+communicate at the link layer, i.e., the layer
+each node that forwards the packet. The packet
+is discarded if Hop Limit is decremented to
+zero.
+
+Source Address       128-bit address of the originator of the packet.
+See [ADDRARCH].
+
+Destination Address  128-bit address of the intended recipient of the
+packet (possibly not the ultimate recipient, if
+a Routing header is present).  See [ADDRARCH]
+and section 4.4.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                     [Page 5]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+4.  IPv6 Extension Headers
+
+In IPv6, optional internet-layer information is encoded in separate
+headers that may be placed between the IPv6 header and the upper-
+layer header in a packet.  There are a small number of such extension
+headers, each identified by a distinct Next Header value.  As
+illustrated in these examples, an IPv6 packet may carry zero, one, or
+more extension headers, each identified by the Next Header field of
+the preceding header:
+
++---------------+------------------------
+|  IPv6 header  | TCP header + data
+|               |
+| Next Header = |
+|      TCP      |
++---------------+------------------------
+
+
++---------------+----------------+------------------------
+|  IPv6 header  | Routing header | TCP header + data
+|               |                |
+| Next Header = |  Next Header = |
+|    Routing    |      TCP       |
++---------------+----------------+------------------------
+
+
++---------------+----------------+-----------------+-----------------
+|  IPv6 header  | Routing header | Fragment header | fragment of TCP
+|               |                |                 |  header + data
+| Next Header = |  Next Header = |  Next Header =  |
+|    Routing    |    Fragment    |       TCP       |
++---------------+----------------+-----------------+-----------------
+
+With one exception, extension headers are not examined or processed
+by any node along a packet's delivery path, until the packet reaches
+the node (or each of the set of nodes, in the case of multicast)
+identified in the Destination Address field of the IPv6 header.
+There, normal demultiplexing on the Next Header field of the IPv6
+header invokes the module to process the first extension header, or
+the upper-layer header if no extension header is present.  The
+contents and semantics of each extension header determine whether or
+not to proceed to the next header.  Therefore, extension headers must
+be processed strictly in the order they appear in the packet; a
+receiver must not, for example, scan through a packet looking for a
+particular kind of extension header and process that header prior to
+processing all preceding ones.
+
+
+
+
+
+Deering & Hinden            Standards Track                     [Page 6]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+The exception referred to in the preceding paragraph is the Hop-by-
+Hop Options header, which carries information that must be examined
+and processed by every node along a packet's delivery path, including
+the source and destination nodes.  The Hop-by-Hop Options header,
+when present, must immediately follow the IPv6 header.  Its presence
+is indicated by the value zero in the Next Header field of the IPv6
+header.
+
+If, as a result of processing a header, a node is required to proceed
+to the next header but the Next Header value in the current header is
+unrecognized by the node, it should discard the packet and send an
+ICMP Parameter Problem message to the source of the packet, with an
+ICMP Code value of 1 ("unrecognized Next Header type encountered")
+and the ICMP Pointer field containing the offset of the unrecognized
+value within the original packet.  The same action should be taken if
+a node encounters a Next Header value of zero in any header other
+than an IPv6 header.
+
+Each extension header is an integer multiple of 8 octets long, in
+order to retain 8-octet alignment for subsequent headers.  Multi-
+octet fields within each extension header are aligned on their
+natural boundaries, i.e., fields of width n octets are placed at an
+integer multiple of n octets from the start of the header, for n = 1,
+2, 4, or 8.
+
+A full implementation of IPv6 includes implementation of the
+following extension headers:
+
+Hop-by-Hop Options
+Routing (Type , send an
+ICMP Parameter Problem, Code 2, message to the packet's
+Source Address, pointing to the unrecognized Option Type.
+
+11 - discard the packet and, only if the packet's Destination
+Address was not a multicast address, send an ICMP Parameter
+Problem, Code 2, message to the packet's Source Address,
+pointing to the unrecognized Option Type.
+
+The third-highest-order bit of the Option Type specifies whether or
+not the Option Data of that option can change en-route to the
+packet's final destination.  When an Authentication header is present
+
+
+
+
+
+Deering & Hinden            Standards Track                     [Page 9]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+in the packet, for any option whose data may change en-route, its
+entire Option Data field must be treated as zero-valued octets when
+computing or verifying the packet's authenticating value.
+
+0 - Option Data does not change en-route
+
+1 - Option Data may change en-route
+
+The three high-order bits described above are to be treated as part
+of the Option Type, not independent of the Option Type.  That is, a
+particular option is identified by a full 8-bit Option Type, not just
+the low-order 5 bits of an Option Type.
+
+The same Option Type numbering space is used for both the Hop-by-Hop
+Options header and the Destination Options header.  However, the
+specification of a particular option may restrict its use to only one
+of those two headers.
+
+Individual options may have specific alignment requirements, to
+ensure that multi-octet values within Option Data fields fall on
+natural boundaries.  The alignment requirement of an option is
+specified using the notation xn+y, meaning the Option Type must
+appear at an integer multiple of x octets from the start of the
+header, plus y octets.  For example:
+
+2n    means any 2-octet offset from the start of the header.
+8n+2  means any 8-octet offset from the start of the header,
+plus 2 octets.
+
+There are two padding options which are used when necessary to align
+subsequent options and to pad out the containing header to a multiple
+of 8 octets in length.  These padding options must be recognized by
+all IPv6 implementations:
+
+Pad1 option  (alignment requirement: none)
+
++-+-+-+-+-+-+-+-+
+|       0       |
++-+-+-+-+-+-+-+-+
+
+NOTE! the format of the Pad1 option is a special case -- it does
+not have length and value fields.
+
+The Pad1 option is used to insert one octet of padding into the
+Options area of a header.  If more than one octet of padding is
+required, the PadN option, described next, should be used, rather
+than multiple Pad1 options.
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 10]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+PadN option  (alignment requirement: none)
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - - -
+|       1       |  Opt Data Len |  Option Data
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - - -
+
+The PadN option is used to insert two or more octets of padding
+into the Options area of a header.  For N octets of padding, the
+Opt Data Len field contains the value N-2, and the Option Data
+consists of N-2 zero-valued octets.
+
+Appendix B contains formatting guidelines for designing new options.
+
+4.3  Hop-by-Hop Options Header
+
+The Hop-by-Hop Options header is used to carry optional information
+that must be examined by every node along a packet's delivery path.
+The Hop-by-Hop Options header is identified by a Next Header value of
+0 in the IPv6 header, and has the following format:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  |  Hdr Ext Len  |                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+|                                                               |
+.                                                               .
+.                            Options                            .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Next Header          8-bit selector.  Identifies the type of header
+immediately following the Hop-by-Hop Options
+header.  Uses the same values as the IPv4
+Protocol field [RFC-1700 et seq.].
+
+Hdr Ext Len          8-bit unsigned integer.  Length of the Hop-by-
+Hop Options header in 8-octet units, not
+including the first 8 octets.
+
+Options              Variable-length field, of length such that the
+complete Hop-by-Hop Options header is an integer
+multiple of 8 octets long.  Contains one or more
+TLV-encoded options, as described in section
+4.2.
+
+The only hop-by-hop options defined in this document are the Pad1 and
+PadN options specified in section 4.2.
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 11]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+4.4  Routing Header
+
+The Routing header is used by an IPv6 source to list one or more
+intermediate nodes to be "visited" on the way to a packet's
+destination.  This function is very similar to IPv4's Loose Source
+and Record Route option.  The Routing header is identified by a Next
+Header value of 43 in the immediately preceding header, and has the
+following format:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  |  Hdr Ext Len  |  Routing Type | Segments Left |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
+.                                                               .
+.                       type-specific data                      .
+.                                                               .
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Next Header          8-bit selector.  Identifies the type of header
+immediately following the Routing header.  Uses
+the same values as the IPv4 Protocol field
+[RFC-1700 et seq.].
+
+Hdr Ext Len          8-bit unsigned integer.  Length of the Routing
+header in 8-octet units, not including the first
+8 octets.
+
+Routing Type         8-bit identifier of a particular Routing header
+variant.
+
+Segments Left        8-bit unsigned integer.  Number of route
+segments remaining, i.e., number of explicitly
+listed intermediate nodes still to be visited
+before reaching the final destination.
+
+type-specific data   Variable-length field, of format determined by
+the Routing Type, and of length such that the
+complete Routing header is an integer multiple
+of 8 octets long.
+
+If, while processing a received packet, a node encounters a Routing
+header with an unrecognized Routing Type value, the required behavior
+of the node depends on the value of the Segments Left field, as
+follows:
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 12]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+If Segments Left is zero, the node must ignore the Routing header
+and proceed to process the next header in the packet, whose type
+is identified by the Next Header field in the Routing header.
+
+If Segments Left is non-zero, the node must discard the packet and
+send an ICMP Parameter Problem, Code 0, message to the packet's
+Source Address, pointing to the unrecognized Routing Type.
+
+If, after processing a Routing header of a received packet, an
+intermediate node determines that the packet is to be forwarded onto
+a link whose link MTU is less than the size of the packet, the node
+must discard the packet and send an ICMP Packet Too Big message to
+the packet's Source Address.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 13]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+The Type 0 Routing header has the following format:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  |  Hdr Ext Len  | Routing Type=0| Segments Left |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                            Reserved                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                              Parameter Problem, Code 0, message to the Source
+Address, pointing to the Hdr Ext Len field, and discard the
+packet
+}
+else {
+compute n, the number of addresses in the Routing header, by
+dividing Hdr Ext Len by 2
+
+if Segments Left is greater than n {
+send an ICMP Parameter Problem, Code 0, message to the Source
+Address, pointing to the Segments Left field, and discard the
+packet
+
+}
+else {
+decrement Segments Left by 1;
+compute i, the index of the next address to be visited in
+the address vector, by subtracting Segments Left from n
+
+if Address [i] or the IPv6 Destination Address is multicast {
+discard the packet
+
+}
+else {
+swap the IPv6 Destination Address and Address[i]
+
+if the IPv6 Hop Limit is less than or equal to 1 {
+send an ICMP Time Exceeded -- Hop Limit Exceeded in
+Transit message to the Source Address and discard the
+packet
+
+}
+else {
+decrement the Hop Limit by 1
+
+resubmit the packet to the IPv6 module for transmission
+to the new destination
+
+}
+
+}
+
+}
+
+}
+
+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 16]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+As an example of the effects of the above algorithm, consider the
+case of a source node S sending a packet to destination node D, using
+a Routing header to cause the packet to be routed via intermediate
+nodes I1, I2, and I3.  The values of the relevant IPv6 header and
+Routing header fields on each segment of the delivery path would be
+as follows:
+
+As the packet travels from S to I1:
+
+Source Address = S                  Hdr Ext Len = 6
+Destination Address = I1            Segments Left = 3
+Address[1] = I2
+Address[2] = I3
+Address[3] = D
+
+As the packet travels from I1 to I2:
+
+Source Address = S                  Hdr Ext Len = 6
+Destination Address = I2            Segments Left = 2
+Address[1] = I1
+Address[2] = I3
+Address[3] = D
+
+As the packet travels from I2 to I3:
+
+Source Address = S                  Hdr Ext Len = 6
+Destination Address = I3            Segments illustrated:
+
+original packet:
+
++------------------+----------------------//-----------------------+
+|  Unfragmentable  |                 Fragmentable                  |
+|       Part       |                     Part                      |
++------------------+----------------------//-----------------------+
+
+The Unfragmentable Part consists of the IPv6 header plus any
+extension headers that must be processed by nodes en route to the
+destination, that is, all headers up to and including the Routing
+header if present, else the Hop-by-Hop Options header if present,
+else no extension headers.
+
+The Fragmentable Part consists of the rest of the packet, that is,
+any extension headers that need be processed only by the final
+destination node(s), plus the upper-layer header and data.
+
+The Fragmentable Part of the original packet is divided into
+fragments, each, except possibly the last ("rightmost") one, being an
+integer multiple of 8 octets long.  The fragments are transmitted in
+separate "fragment packets" as illustrated:
+
+original packet:
+
++------------------+--------------+--------------+--//--+----------+
+|  Unfragmentable  |    first     |    second    |      |   last   |
+|       Part       |   fragment   |   fragment   | .... | fragment |
++------------------+--------------+--------------+--//--+----------+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 19]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+fragment packets:
+
++------------------+--------+--------------+
+|  Unfragmentable  |Fragment|    first     |
+|       Part       | Header |   fragment   |
++------------------+--------+--------------+
+
++------------------+--------+--------------+
+|  Unfragmentable  |Fragment|    second    |
+|       Part       | Header |   fragment   |
++------------------+--------+--------------+
+o
+o
+o
++------------------+--------+----------+
+|  Unfragmentable  |Fragment|   last   |
+|       Part       | Header | fragment |
++------------------+--------+----------+
+
+Each fragment packet is composed of:
+
+(1) The Unfragmentable Part of the original packet, with the
+Payload Length of the original IPv6 header changed to contain
+the length of this fragment packet only (excluding the length
+of the IPv6 header itself), and the Next Header field of the
+last header of the Unfragmentable Part changed to 44.
+
+(2) A Fragment header containing:
+
+The Next Header value that identifies the first header of
+the Fragmentable Part of the original packet.
+
+A Fragment Offset containing the offset of the fragment,
+in 8-octet units, relative to the start of the
+Fragmentable Part of the original packet.  The Fragment
+Offset of the first ("leftmost") fragment is 0.
+
+An M flag value of 0 if the fragment is the last
+("rightmost") one, else an M flag value of 1.
+
+The Identification value generated for the original
+packet.
+
+(3) The fragment itself.
+
+The lengths of the fragments must be chosen such that the resulting
+fragment packets fit within the MTU of the path to the packets'
+destination(s).
+
+
+
+Deering & Hinden            Standards Track                    [Page 20]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+At the destination, fragment packets are reassembled into their
+original, unfragmented form, as illustrated:
+
+reassembled original packet:
+
++------------------+----------------------//------------------------+
+|  Unfragmentable  |                 Fragmentable                   |
+|       Part       |                     Part                       |
++------------------+----------------------//------------------------+
+
+The following rules govern reassembly:
+
+An original packet is reassembled only from fragment packets that
+have the same Source Address, Destination Address, and Fragment
+Identification.
+
+The Unfragmentable Part of the reassembled packet consists of all
+headers up to, but not including, the Fragment header of the first
+fragment packet (that is, the packet whose Fragment Offset is
+zero), with the following two changes:
+
+The Next Header field of the last header of the Unfragmentable
+Part is obtained from the Next Header field of the first
+fragment's Fragment header.
+
+The Payload Length of the reassembled packet is computed from
+the length of the Unfragmentable Part and the length and offset
+of the last fragment.  For example, a formula for computing the
+Payload Length of the reassembled original packet is:
+
+PL.orig = PL.first - FL.first - 8 + (8 * FO.last) + FL.last
+
+where
+PL.orig  = Payload Length field of reassembled packet.
+PL.first = Payload Length field of first fragment packet.
+FL.first = length of fragment following Fragment header of
+first fragment packet.
+FO.last  = Fragment Offset field of Fragment header of
+last fragment packet.
+FL.last  = length of fragment following Fragment header of
+last fragment packet.
+
+The Fragmentable Part of the reassembled packet is constructed
+from the fragments following the Fragment headers in each of the
+fragment packets.  The length of each fragment is computed by
+subtracting from the packet's Payload Length the length of the
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 21]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+headers between the IPv6 header and fragment itself; its relative
+position in Fragmentable Part is computed from its Fragment Offset
+value.
+
+The Fragment header is not present in the final, reassembled
+packet.
+
+The following error conditions may arise when reassembling fragmented
+packets:
+
+If insufficient fragments are received to complete reassembly of a
+packet within 60 seconds of the reception of the first-arriving
+fragment of that packet, reassembly of that packet must be
+abandoned and all the fragments that have been received for that
+packet must be discarded.  If the first fragment (i.e., the one
+with a Fragment Offset of zero) has been received, an ICMP Time
+nation node to discard
+the packet and, only if the packet's Destination Address is not
+a multicast address, send an ICMP Unrecognized Type message to
+the packet's Source Address, then the information may be
+encoded either as a separate header or as an option in the
+
+
+
+Deering & Hinden            Standards Track                    [Page 23]
+me" service.  This aspect of IPv6 is, at the time of
+writing, still experimental and subject to change as the requirements
+for flow support in the Internet become clearer.  Hosts or routers
+that do not support the functions of the Flow Label field are
+required to set the field to zero when originating a packet, pass the
+field on unchanged when forwarding a packet, and ignore the field
+when receiving a packet.
+
+Appendix A describes the current intended semantics and usage of the
+Flow Label field.
+
+7.  Traffic Classes
+
+The 8-bit Traffic Class field in the IPv6 header is available for use
+by originating nodes and/or forwarding routers to identify and
+distinguish between different classes or priorities of IPv6 packets.
+At the point in time at which this specification is being written,
+there are a number of experiments underway in the use of the IPv4
+Type of Service and/or Precedence bits to provide various forms of
+"differentiated service" for IP packets, other than through the use
+of explicit flow set-up.  The Traffic Class field in the IPv6 header
+is intended to allow similar functionality to be supported in IPv6.
+
+
+
+Deering & Hinden            Standards Track                    [Page 25]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+It is hoped that those experiments will eventually lead to agreement
+on what sorts of traffic classifications are most useful for IP
+packets.  Detailed definitions of the syntax and semantics of all or
+some of the IPv6 Traffic Class bits, whether experimental or intended
+for eventual standardization, are to be provided in separate
+documents.
+
+The following general requirements apply to the Traffic Class field:
+
+o  The service interface to the IPv6 service within a node must
+provide a means for an upper-layer protocol to supply the value
+of the Traffic Class bits in packets originated by that upper-
+layer protocol.  The dsion headers present between the IPv6
+header and the upper-layer header.
+
+o  Unlike IPv4, when UDP packets are originated by an IPv6 node,
+the UDP checksum is not optional.  That is, whenever
+originating a UDP packet, an IPv6 node must compute a UDP
+checksum over the packet and the pseudo-header, and, if that
+computation yields a result of zero, it must be changed to hex
+FFFF for placement in the UDP header.  IPv6 receivers must
+discard UDP packets containing a zero checksum, and should log
+the error.
+
+The IPv6 version of ICMP [ICMPv6] includes the above pseudo-header in
+its checksum computation; this is a change from the IPv4 version of
+ICMP, which does not include a pseudo-header in its checksum.  The
+reason for the change is to protect ICMP from misdelivery or
+corruption of those fields of the IPv6 header on which it depends,
+which, unlike IPv4, are not covered by an internet-layer checksum.
+The Next Header field in the pseudo-header for ICMP contains the
+value 58, which identifies the IPv6 version of ICMP.
+
+8.2 Maximum Packet Lifetime
+
+Unlike IPv4, IPv6 nodes are not requp to a maximum alignment of 8 octets).  This approach is
+illustrated in the following examples:
+
+Example 1
+
+If an option X required two data fields, one of length 8 octets and
+one of length 4 octets, it would be laid out as follows:
+
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Option Type=X |Opt Data Len=12|
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                         8-octet field                         +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 32]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+Its alignment requirement is 8n+2, to ensure that the 8-octet field
+starts at a multiple-of-8 offset from the start of the enclosing
+header.  A complete Hop-by-Hop or Destination Options header
+containing this one option would look as follows:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  | Hdr Ext Len=1 | Option Type=X |Opt Data Len=12|
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                         8-octet field                         +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Example 2
+
+If an option Y required three data fields, one of length 4 octets,
+one of length 2 octets, and one of length 1 octet, it would be laid
+out as follows:
+
++-+-+-+-+-+-+-+-+
+| Option Type=Y |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Opt Data Len=7 | 1-octet field |         2-octet field         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Its alignment requirement is 4n+3, to ensure that the 4-octet field
+starts at a multiple-of-4 offset from the start of the enclosing
+header.  A complete Hop-by-Hop or Destination Options header
+containing this one option would look as follows:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  | Hdr Ext Len=1 | Pad1 Option=0 | Option Type=Y |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Opt Data Len=7 | 1-octet field |         2-octet field         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| PadN Option=1 |Opt Data Len=2 |       0       |       0       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+
+
+
+
+
+Deering & Hinden            Standards Track                    [Page 33]
+
+RFC 2460                   IPv6 Specification              December 1998
+
+
+Example 3
+
+A Hop-by-Hop or Destination Options header containing both options X
+and Y from Examples 1 and 2 would have one of the two following
+formats, depending on which option appeared first:
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Next Header  | Hdr Ext Len=3 | Option Type=X |Opt Data Len=12|
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                                                               |
++                         8-octet field                         +
+|                                                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| PadN Option=1 |Opt Data Len=1 |       0       | Option Type=Y |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Opt Data Len=7 | 1-octet field |         2-octet field         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         4-octet field                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| PadN Option=1 |Opt Data Len=2 |       0       |       0       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+Upload file
+Special pages
+Permanent link
+Page information
+Wikidata item
+Cite this page
+Print/export
+Create a book
+Download as PDF
+Printable version
+In other projects
+Wikimedia Commons
+
+Languages
+العربية
+Español
+한국어
+हिन्दी
+Русский
+Tiếng Việt
+吴语
+粵語
+中文
+34 more
+Edit links
+This page was last edited on 17 April 2018, at 22:53.
+Text is available under the Creative Commons Attribution-ShareAlike License; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy. Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc., a non-profit organization.
+Privacy policyAbout WikipediaDisclaimersContact WikipediaDevelopersCookie statementMobile viewWikimedia Foundation Powered by MediaWiki
+
+
+
+
+
+
+1234567890!@#$%^&*

@@ -1,0 +1,8 @@
+#matt.life   # Your site's address
+
+https://quic.clemente.io:443 {
+    root /root/html/
+    tls /root/fullchain.pem /root/privkey.pem {
+    }
+}
+
